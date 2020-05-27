@@ -2,6 +2,8 @@ package com.example.rhymeit;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,11 +29,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
   final   String URl1 = "https://api.datamuse.com/words?";
@@ -53,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
     }
-
     private void sendMessage() {
         URL2 = URl1+"ml=duck&sp=b*";
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, URL2, null,
@@ -104,24 +112,37 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 url = dictionaryURl(userinput.getText().toString());
                 MyDictionaryRequest myDictionaryRequest = new MyDictionaryRequest(MainActivity.this);
-                myDictionaryRequest.execute(url);
-                if ((myDictionaryRequest.getDef() == "null")&&(!check(userinput.getText().toString()))) {
-                            Log.d("sfafa","inside");
-                            messages.add(userinput.getText().toString());
-                            direction.add(true);
-                            used.add(userinput.getText().toString());
-                            mAdapter.notifyDataSetChanged();
-                            userinput.setText("");
-                            getreply();
-                            //                Alert Dialog
-
-                } else {
-//                    userinput.setText("");
-                    Log.d("sfafa","outside");
+                try {
+                    String asd = myDictionaryRequest.execute(url).get();
+                    checkRhyme(userinput.getText().toString());
+                    if ((!check(userinput.getText().toString())) && (asd != "null") && (checkRhyme(userinput.getText().toString()))) {
+                        Log.d("sfafa","inside");
+                        messages.add(userinput.getText().toString());
+                        direction.add(true);
+                        used.add(userinput.getText().toString());
+                        mAdapter.notifyDataSetChanged();
+                        getreply();
+                        //                Alert Dialog
+                    } else {
+    //                    userinput.setText("");
+                        Log.d("sfafa","outside");
+                    }
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
                 }
-
+                userinput.setText("");
             }
         });
+    }
+
+    private Boolean checkRhyme(String user) {
+        int l = used.size()-1;
+        String muri = used.get(l);
+        Character ch=  muri.charAt(muri.length()-1);
+        if(ch == user.charAt(0)){
+            return true;
+        }
+        return false;
     }
 
     private void getreply() {
@@ -179,3 +200,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+

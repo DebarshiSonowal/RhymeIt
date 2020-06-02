@@ -95,14 +95,14 @@ public class MyDictionaryRequest extends AsyncTask<String,Integer,String> {
 
                 def = de.getString(0);
 
-                Toast.makeText(mContext,def,Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext,def,Toast.LENGTH_SHORT).show();
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         } else {
             def = sd;
-            Toast.makeText(mContext,def,Toast.LENGTH_SHORT).show();
+//            Toast.makeText(mContext,def,Toast.LENGTH_SHORT).show();
         }
     }
 }

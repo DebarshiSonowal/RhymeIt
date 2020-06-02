@@ -1,0 +1,377 @@
+package com.example.rhymeit;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.DownloadManager;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+import com.github.nikartm.button.FitButton;
+import com.mikhaellopez.circularprogressbar.CircularProgressBar;
+import com.shashank.sony.fancytoastlib.FancyToast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
+
+public class RhymingGame extends AppCompatActivity {
+    final String URl1 = "https://api.datamuse.com/words?";
+    final String URl = "https://api.datamuse.com/words?sp=";
+    private static final long START_TIME_IN_MILLIS = 30000;
+    private static long TIMER;
+    private CountDownTimer mCountDownTimer;
+    String URL3, URL2, url;
+    private RequestQueue mRequestQueue;
+
+    ProgressBar mProgressBar;
+    Animation blink;
+    ImageView first, second, third;
+    EditText userinput;
+    TextView scoreview;
+    Animation.AnimationListener mAnimationListener;
+    CircularProgressBar timecircle;
+    ListView interactionlist;
+    List<String> used = new ArrayList<>();
+    List<String> messages = new ArrayList<>();
+    List<Boolean> direction = new ArrayList<>();
+    Adapter mAdapter;
+    int i = 0, j = 0,l;
+    List<String> keywords;
+    FitButton sendbtn,hintbtn;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mCountDownTimer.cancel();
+        mCountDownTimer = null;
+        mProgressBar =null;
+        blink = null;
+        mAnimationListener = null;
+        timecircle =null;
+        System.gc();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        first.startAnimation(blink);
+        second.startAnimation(blink);
+        third.startAnimation(blink);
+
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_ryming_game);
+        //Initialize keywords
+        keywords = new ArrayList<>();
+        keywords.add("buck");
+        keywords.add("home");
+        keywords.add("school");
+        keywords.add("duck");
+        keywords.add("holy");
+
+        //Attach views
+        mProgressBar = findViewById(R.id.progressBar);
+        sendbtn = findViewById(R.id.fbtn);
+        userinput = findViewById(R.id.userbox2);
+        timecircle = findViewById(R.id.circularProgressBar);
+        interactionlist = findViewById(R.id.listview);
+        mRequestQueue = Volley.newRequestQueue(this);
+        hintbtn = findViewById(R.id.fbtn2);
+        mAdapter = new Adapter(this, messages, direction);
+        interactionlist.setAdapter(mAdapter);
+        mProgressBar.setMax(10);
+        timecircle.setProgressMax(START_TIME_IN_MILLIS);
+        scoreview = findViewById(R.id.scoreview2);
+        blink = AnimationUtils.loadAnimation(this, R.anim.blink);
+        blink.setAnimationListener(mAnimationListener);
+        first = findViewById(R.id.firstlive);
+        second = findViewById(R.id.secondlive);
+        third = findViewById(R.id.thirdlive);
+        l=0;
+
+        //On click listener
+        hintbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gethelp();
+            }
+        });
+
+        sendbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!TextUtils.isEmpty(userinput.getText())){
+                    url = dictionaryURl(userinput.getText().toString());
+                    MyDictionaryRequest myDictionaryRequest = new MyDictionaryRequest(RhymingGame.this);
+                    try {
+                        String asd = myDictionaryRequest.execute(url).get();
+                       if(!checkIfUsed(userinput.getText().toString().toLowerCase())){
+                            if(asd != "null"){
+                                if(checkRhyme(userinput.getText().toString().toLowerCase())){
+                                    mCountDownTimer.cancel();
+                                    i= i+1;
+                                    l=l+1;
+                                    mProgressBar.setProgress(i);
+                                    scoreview.setText("Score: "+l+"/"+"10");
+                                    if(mProgressBar.getProgress() == 10){
+                                        SharedPreferences preferences = getSharedPreferences("Progress",MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = preferences.edit();
+                                        editor.clear();
+                                        editor.putInt("score",i);
+                                        editor.commit();
+                                        Successful_dialog dialog = new Successful_dialog();
+                                        dialog.show(getSupportFragmentManager(),"Successful");
+
+                                    }
+                                    sendTheMessage(userinput.getText().toString());
+                                    getReply();
+
+                                }else {
+                                    FancyToast.makeText(RhymingGame.this,"It does not rhyme with other word",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
+                                    reduceLives();
+                                }
+                            }else {
+                                FancyToast.makeText(RhymingGame.this,"This is not a meaningful word",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+                                reduceLives();
+                            }
+                       }else {
+                           FancyToast.makeText(RhymingGame.this,"You have used it",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+                          reduceLives();
+                       }
+                       userinput.setText("");
+
+                    } catch (ExecutionException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }else {
+                    Toast.makeText(RhymingGame.this,"Write something",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        //Get the first input from Computer
+        Random random = new Random();
+
+        getinput(random.nextInt(4));
+
+    }
+
+    private void gethelp() {
+
+    }
+
+    private void reduceLives() {
+        if (first.getVisibility() == View.VISIBLE) {
+            first.setVisibility(View.INVISIBLE);
+            first.clearAnimation();
+//            FancyToast.makeText(RhymingGame.this,"You have lost first life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+        }else{
+            if (second.getVisibility() == View.VISIBLE){
+                second.setVisibility(View.INVISIBLE);
+                second.clearAnimation();
+//                FancyToast.makeText(RhymingGame.this,"You have lost second life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+            }else {
+                if(third.getVisibility() == View.VISIBLE){
+                    third.setVisibility(View.INVISIBLE);
+                    third.clearAnimation();
+//
+                }else{
+                    FailedDialog dialog = new FailedDialog();
+                    dialog.show(getSupportFragmentManager(),"Failed");
+                }
+            }
+        }
+    }
+
+    private void getReply() {
+        int l = used.size()-1;
+        String muri =used.get(l);
+        URL3 = URl + muri.substring(muri.length()-1)+"??";
+        Log.d("Reply",URL3);
+        getRhymingWord(URL3);
+    }
+
+    private void getRhymingWord(String url3) {
+        final JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url3, null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            JSONArray jsonArray =response;
+                            for (int i=0;i<jsonArray.length();i++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                if(!checkIfUsed(jsonObject.getString("word"))){
+                                    Log.d("Reply",jsonObject.getString("word"));
+                                    messages.add(jsonObject.getString("word"));
+                                    direction.add(false);
+                                    used.add(jsonObject.getString("word"));
+                                    mAdapter.notifyDataSetChanged();
+                                    startTimer();
+                                    break;
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        mRequestQueue.add(request);
+    }
+
+    private void sendTheMessage(String toString) {
+        messages.add(toString);
+        direction.add(true);
+        used.add(toString);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private boolean checkRhyme(String user) {
+        int l = used.size()-1;
+        String muri = used.get(l);
+        Character ch=  muri.charAt(muri.length()-1);
+        if(ch == user.charAt(0)){
+            return true;
+        }
+        return false;
+     }
+
+    private boolean checkIfUsed(String toString) {
+        for(int j=0;j<used.size();j++)
+        {
+            if(toString.equals(used.get(j))){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void getinput(int nextInt) {
+        String string = keywords.get(nextInt);
+        URL2 = URl1 + "ml=" + string.toLowerCase() + "&sp=b*";
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, URL2, null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            JSONArray jsonArray = response;
+                            Log.d("word", "1");
+                            Random randomNumGen = new Random();
+                            int number = randomNumGen.nextInt(10);
+                            JSONObject jsonObject = jsonArray.getJSONObject(number);
+                            Log.d("word",jsonObject.getString("word")+"1");
+                            startTimer();
+                            getMessage(jsonObject.getString("word"));
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        mRequestQueue.add(request);
+
+    }
+
+    private void getMessage(String word) {
+        messages.add(word);
+        Log.d("word", word+"2");
+        direction.add(false);
+        used.add(word);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void startTimer() {
+        timecircle.setProgress(0);
+        try {
+            mCountDownTimer.cancel();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+             mCountDownTimer  = new CountDownTimer(START_TIME_IN_MILLIS,1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                TIMER = millisUntilFinished;
+                timecircle.setBackgroundProgressBarColor(Color.BLACK);
+                timecircle.setProgress(TIMER);
+
+            }
+
+            @Override
+            public void onFinish() {
+                reduceLives1();
+            }
+
+        };
+        mCountDownTimer.start();
+
+    }
+
+    private void reduceLives1() {
+        if (first.getVisibility() == View.VISIBLE) {
+            first.setVisibility(View.INVISIBLE);
+            first.clearAnimation();
+            FancyToast.makeText(RhymingGame.this,"You have lost first life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+        }else{
+            if (second.getVisibility() == View.VISIBLE){
+                second.setVisibility(View.INVISIBLE);
+                second.clearAnimation();
+                FancyToast.makeText(RhymingGame.this,"You have lost second life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+            }else {
+                if(third.getVisibility() == View.VISIBLE){
+                    third.setVisibility(View.INVISIBLE);
+                    third.clearAnimation();
+                    FancyToast.makeText(RhymingGame.this,"You have lost third life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+                }else{
+                    FailedDialog dialog = new FailedDialog();
+                    dialog.show(getSupportFragmentManager(),"Failed");
+                }
+            }
+        }
+    }
+
+    private String dictionaryURl(String word){
+        final String language = "en";
+        final String word_id=word.toLowerCase();
+        return "https://od-api.oxforddictionaries.com:443/api/v2/entries/" + language + "/" + word_id;
+    }
+}

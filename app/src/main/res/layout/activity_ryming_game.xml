@@ -1,10 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".RhymingGame">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/listview"
+        app:layout_constraintEnd_toStartOf="@+id/scoreview2"
+        app:layout_constraintStart_toEndOf="@+id/circularProgressBar"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar">
+
+        <ImageView
+            android:id="@+id/firstlive"
+            android:layout_width="77dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:layout_constraintBottom_toTopOf="@+id/guideline3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.905"
+            app:layout_constraintStart_toEndOf="@+id/circularProgressBar"
+            app:layout_constraintTop_toTopOf="@+id/guideline"
+            app:srcCompat="@drawable/background" />
+
+        <ImageView
+            android:id="@+id/secondlive"
+            android:layout_width="77dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00FFFFFF"
+            app:srcCompat="@drawable/background" />
+
+        <ImageView
+            android:id="@+id/thirdlive"
+            android:layout_width="77dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/background" />
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -64,6 +101,7 @@
         app:layout_constraintGuide_percent="0.18" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#000000"
@@ -86,25 +124,46 @@
                 android:background="#FFFFFF"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
                 app:layout_constraintBottom_toTopOf="@+id/guideline7"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/guideline6">
 
-                <EditText
-                    android:id="@+id/userbox"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#00FFFFFF"
-                    android:ems="10"
-                    android:inputType="textPersonName"
-                    android:textColor="#000000"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.039"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.989" />
+                    android:layout_height="match_parent">
+
+                    <EditText
+                        android:id="@+id/userbox2"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="#FFFFFF"
+                        android:ems="10"
+                        android:hint="Enter a message"
+                        android:inputType="textPersonName|textNoSuggestions"
+                        android:textColor="#000000"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/guideline18"
+                        app:layout_constraintHorizontal_bias="0.039"
+                        app:layout_constraintStart_toStartOf="@+id/guideline17"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.989" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline18"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_begin="239dp" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline17"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_begin="16dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.constraintlayout.widget.Guideline
@@ -123,35 +182,45 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageButton
-            android:id="@+id/sendbtn"
-            android:layout_width="72dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#00FFFFFF"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/ic_send"
-            tools:srcCompat="@drawable/ic_send" />
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/hintbtn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#00FFFFFF"
+        <com.github.nikartm.button.FitButton
+            android:id="@+id/fbtn"
+            android:layout_width="78dp"
+            android:layout_height="73dp"
+            android:enabled="true"
             android:gravity="center"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_heart"
-            android:text="Score: 3/13"
-            android:textColor="#FFD900"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0" />
+            app:fb_cornerRadius="2dp"
+            app:fb_divHeight="40dp"
+            app:fb_divWidth="1dp"
+            app:fb_icon="@drawable/ic_send"
+            app:fb_iconColor="#0000FFFF"
+            app:fb_iconHeight="60dp"
+            app:fb_iconMarginEnd="16dp"
+            app:fb_iconMarginStart="20dp"
+            app:fb_iconPosition="left"
+            app:fb_iconWidth="60dp"
+            app:fb_rippleColor="#FFFFFF"
+            app:fb_shape="rectangle"
+            app:fb_textColor="#FFF" />
+
+        <com.github.nikartm.button.FitButton
+            android:id="@+id/fbtn2"
+            android:layout_width="78dp"
+            android:layout_height="73dp"
+            android:enabled="true"
+            android:gravity="center"
+            app:fb_cornerRadius="2dp"
+            app:fb_divHeight="40dp"
+            app:fb_divWidth="1dp"
+            app:fb_icon="@drawable/ic_heart"
+            app:fb_iconColor="#0000FFFF"
+            app:fb_iconHeight="72dp"
+            app:fb_iconMarginEnd="16dp"
+            app:fb_iconMarginStart="20dp"
+            app:fb_iconPosition="left"
+            app:fb_iconWidth="72dp"
+            app:fb_rippleColor="#FFFFFF"
+            app:fb_shape="rectangle"
+            app:fb_textColor="#FFF" />
 
     </LinearLayout>
 
@@ -159,7 +228,7 @@
         android:id="@+id/circularProgressBar"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:cpb_background_progressbar_color="#b6bbd8"
+        app:cpb_background_progressbar_color="#000000"
         app:cpb_background_progressbar_width="5dp"
         app:cpb_progress_direction="to_right"
         app:cpb_progressbar_color="#FFFFFF"
@@ -174,62 +243,13 @@
 
     </com.mikhaellopez.circularprogressbar.CircularProgressBar>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:cardBackgroundColor="#00FFFFFF"
-        app:cardElevation="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline3"
-        app:layout_constraintEnd_toStartOf="@+id/guideline8"
-        app:layout_constraintHorizontal_bias="0.363"
-        app:layout_constraintStart_toStartOf="@+id/guideline5"
-        app:layout_constraintTop_toTopOf="@+id/guideline"
-        app:layout_constraintVertical_bias="1.0">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#00FFFFFF"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/firstlive"
-                android:layout_width="77dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#00FFFFFF"
-                app:layout_constraintBottom_toTopOf="@+id/guideline3"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.905"
-                app:layout_constraintStart_toEndOf="@+id/circularProgressBar"
-                app:layout_constraintTop_toTopOf="@+id/guideline"
-                app:srcCompat="@drawable/background" />
-
-            <ImageView
-                android:id="@+id/secondlive"
-                android:layout_width="77dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#00FFFFFF"
-                app:srcCompat="@drawable/background" />
-
-            <ImageView
-                android:id="@+id/thirdlive"
-                android:layout_width="77dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#00FFFFFF"
-                app:srcCompat="@drawable/background" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
     <TextView
         android:id="@+id/scoreview2"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#FFD900"
         android:gravity="center"
+        android:text="Score: "
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="24sp"

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "517787635764",
+    "firebase_url": "https://rhymeit-2577c.firebaseio.com",
+    "project_id": "rhymeit-2577c",
+    "storage_bucket": "rhymeit-2577c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517787635764:android:d9ef93f5ba0072dcf1ba61",
+        "android_client_info": {
+          "package_name": "com.example.rhymeit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "517787635764-5hpp59jqfmgb0ef4ht6ac6sa6alvmjj9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rhymeit",
+            "certificate_hash": "a811250c388194aec02d0be825f7c80a025040e0"
+          }
+        },
+        {
+          "client_id": "517787635764-o0etrkinvlgpbff5ej5hkl46om0ps777.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9l57UnABdHcCTu14qwaQjZUyER1y9tRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "517787635764-o0etrkinvlgpbff5ej5hkl46om0ps777.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

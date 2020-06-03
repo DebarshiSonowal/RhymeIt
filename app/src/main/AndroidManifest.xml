@@ -18,10 +18,10 @@
         </activity>
         <receiver android:name=".Internetconnection">
             <intent-filter>
-
+<action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
             </intent-filter>
         </receiver>
-        <activity android:name=".MainActivity3">
+        <activity android:name=".ScoreShowing">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
@@ -31,18 +31,24 @@
             <!-- </intent-filter> -->
         </activity>
         <activity android:name=".RhymingGame">
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+        </activity>
+        <activity android:name=".GameOptions" />
+        <activity
+            android:name=".FailedDialog"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            tools:ignore="Instantiatable" />
+        <activity android:name=".Home" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity2" />
-        <activity
-            android:name=".FailedDialog"
-            android:theme="@style/Theme.AppCompat.Dialog"
-            tools:ignore="Instantiatable" />
-        <activity android:name=".Home" />
         <activity android:name=".MainActivity">
 
             <!-- <intent-filter> -->

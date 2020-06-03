@@ -2,12 +2,10 @@ package com.example.rhymeit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,7 +36,7 @@ int i=0;
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(getContext(),"Activity Ended",Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getContext(),MainActivity3.class);
+                        Intent intent = new Intent(getContext(), ScoreShowing.class);
                         intent.putExtra("score",i);
                         startActivity(intent);
                     }

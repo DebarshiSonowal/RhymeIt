@@ -3,6 +3,7 @@ package com.example.rhymeit;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DownloadManager;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -135,30 +136,34 @@ public class RhymingGame extends AppCompatActivity {
                     MyDictionaryRequest myDictionaryRequest = new MyDictionaryRequest(RhymingGame.this);
                     try {
                         String asd = myDictionaryRequest.execute(url).get();
+                        i= i+1;
+                        mProgressBar.setProgress(i);
                        if(!checkIfUsed(userinput.getText().toString().toLowerCase())){
                             if(asd != "null"){
-                                if(checkRhyme(userinput.getText().toString().toLowerCase())){
-                                    mCountDownTimer.cancel();
-                                    i= i+1;
-                                    l=l+1;
-                                    mProgressBar.setProgress(i);
-                                    scoreview.setText("Score: "+l+"/"+"10");
-                                    if(mProgressBar.getProgress() == 10){
-                                        SharedPreferences preferences = getSharedPreferences("Progress",MODE_PRIVATE);
-                                        SharedPreferences.Editor editor = preferences.edit();
-                                        editor.clear();
-                                        editor.putInt("score",i);
-                                        editor.commit();
-                                        Successful_dialog dialog = new Successful_dialog();
-                                        dialog.show(getSupportFragmentManager(),"Successful");
+                                if (getNoChar(getLevelno()) <= userinput.getText().length()) {
+                                    if(checkRhyme(userinput.getText().toString().toLowerCase())){
+                                        mCountDownTimer.cancel();
+                                        l=l+1;
+                                        scoreview.setText("Score: "+l+"/"+"10");
+                                        if(mProgressBar.getProgress() == 10){
+                                            SharedPreferences preferences = getSharedPreferences("Progress",MODE_PRIVATE);
+                                            SharedPreferences.Editor editor = preferences.edit();
+                                            editor.clear();
+                                            editor.putInt("score",i);
+                                            editor.commit();
+                                            Successful_dialog dialog = new Successful_dialog();
+                                            dialog.show(getSupportFragmentManager(),"Successful");
 
+                                        }
+                                        sendTheMessage(userinput.getText().toString());
+                                        getReply();
+
+                                    }else {
+                                        FancyToast.makeText(RhymingGame.this,"It does not rhyme with other word",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
+                                        reduceLives();
                                     }
-                                    sendTheMessage(userinput.getText().toString());
-                                    getReply();
-
                                 }else {
-                                    FancyToast.makeText(RhymingGame.this,"It does not rhyme with other word",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
-                                    reduceLives();
+                                    FancyToast.makeText(RhymingGame.this,"The minimum character criteria is "+getNoChar(getLevelno()),FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
                                 }
                             }else {
                                 FancyToast.makeText(RhymingGame.this,"This is not a meaningful word",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
@@ -187,7 +192,30 @@ public class RhymingGame extends AppCompatActivity {
 
     }
 
+    private int getNoChar(int levelno) {
+        int no;
+        if(levelno == 1){
+            no = 0;
+        }else if(levelno == 2){
+            no = 3;
+        }else if(levelno == 3) {
+            no = 4;
+        }else {
+            no =5;
+        }
+        return no;
+    }
+
+    private int getLevelno() {
+        return getIntent().getIntExtra("level",1);
+    }
+
     private void gethelp() {
+        int l = used.size()-1;
+        String muri =used.get(l);
+        URL3 = URl + muri.substring(muri.length()-1)+"??";
+        Log.d("Reply",URL3);
+        getRhymingWordHelp(URL3);
 
     }
 
@@ -220,6 +248,52 @@ public class RhymingGame extends AppCompatActivity {
         URL3 = URl + muri.substring(muri.length()-1)+"??";
         Log.d("Reply",URL3);
         getRhymingWord(URL3);
+    }
+
+    private void getRhymingWordHelp(String url3) {
+        final JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url3, null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            JSONArray jsonArray =response;
+                            for (int i=0;i<jsonArray.length();i++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                if(!checkIfUsed(jsonObject.getString("word"))){
+                                    Log.d("Reply",jsonObject.getString("word"));
+                                    messages.add(jsonObject.getString("word"));
+                                    direction.add(true);
+                                    used.add(jsonObject.getString("word"));
+                                    mAdapter.notifyDataSetChanged();
+                                    i= i+1;
+                                    mProgressBar.setProgress(i);
+                                    l=l+1;
+                                    scoreview.setText("Score: "+l+"/"+"10");
+                                    if(mProgressBar.getProgress() == 10){
+                                        SharedPreferences preferences = getSharedPreferences("Progress",MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = preferences.edit();
+                                        editor.clear();
+                                        editor.putInt("score",i);
+                                        editor.commit();
+                                        Successful_dialog dialog = new Successful_dialog();
+                                        dialog.show(getSupportFragmentManager(),"Successful");
+
+                                    }
+                                    startTimer();
+                                    break;
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        mRequestQueue.add(request);
     }
 
     private void getRhymingWord(String url3) {

@@ -46,6 +46,7 @@ public class RhymingGame extends AppCompatActivity {
     final String URl1 = "https://api.datamuse.com/words?";
     final String URl = "https://api.datamuse.com/words?sp=";
     private static final long START_TIME_IN_MILLIS = 30000;
+    //Atanas Nikolaev
     private static long TIMER;
     private CountDownTimer mCountDownTimer;
     String URL3, URL2, url;
@@ -66,7 +67,7 @@ public class RhymingGame extends AppCompatActivity {
     int i = 0, j = 0,l;
     List<String> keywords;
     FitButton sendbtn,hintbtn;
-
+    public static final String name ="Progress";
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -145,18 +146,21 @@ public class RhymingGame extends AppCompatActivity {
                                         mCountDownTimer.cancel();
                                         l=l+1;
                                         scoreview.setText("Score: "+l+"/"+"10");
+                                        SharedPreferences preferences = getSharedPreferences(name,MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = preferences.edit();
+                                        editor.clear();
+                                        editor.putInt("score",l);
+                                        editor.apply();
                                         if(mProgressBar.getProgress() == 10){
-                                            SharedPreferences preferences = getSharedPreferences("Progress",MODE_PRIVATE);
-                                            SharedPreferences.Editor editor = preferences.edit();
-                                            editor.clear();
-                                            editor.putInt("score",i);
-                                            editor.commit();
+                                            mCountDownTimer.cancel();
                                             Successful_dialog dialog = new Successful_dialog();
                                             dialog.show(getSupportFragmentManager(),"Successful");
 
+                                        }else{
+                                            sendTheMessage(userinput.getText().toString());
+                                            getReply();
                                         }
-                                        sendTheMessage(userinput.getText().toString());
-                                        getReply();
+
 
                                     }else {
                                         FancyToast.makeText(RhymingGame.this,"It does not rhyme with other word",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
@@ -235,6 +239,7 @@ public class RhymingGame extends AppCompatActivity {
                     third.clearAnimation();
 //
                 }else{
+                    mCountDownTimer.cancel();
                     FailedDialog dialog = new FailedDialog();
                     dialog.show(getSupportFragmentManager(),"Failed");
                 }
@@ -269,17 +274,19 @@ public class RhymingGame extends AppCompatActivity {
                                     mProgressBar.setProgress(i);
                                     l=l+1;
                                     scoreview.setText("Score: "+l+"/"+"10");
+                                    SharedPreferences preferences = getSharedPreferences(name,MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = preferences.edit();
+                                    editor.clear();
+                                    editor.putInt("score",l);
+                                    editor.apply();
                                     if(mProgressBar.getProgress() == 10){
-                                        SharedPreferences preferences = getSharedPreferences("Progress",MODE_PRIVATE);
-                                        SharedPreferences.Editor editor = preferences.edit();
-                                        editor.clear();
-                                        editor.putInt("score",i);
-                                        editor.commit();
+                                        mCountDownTimer.cancel();
                                         Successful_dialog dialog = new Successful_dialog();
                                         dialog.show(getSupportFragmentManager(),"Successful");
 
                                     }
-                                    startTimer();
+//                                    startTimer();
+                                    getReply();
                                     break;
                                 }
                             }
@@ -436,6 +443,7 @@ public class RhymingGame extends AppCompatActivity {
                     third.clearAnimation();
                     FancyToast.makeText(RhymingGame.this,"You have lost third life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
                 }else{
+                    mCountDownTimer.cancel();
                     FailedDialog dialog = new FailedDialog();
                     dialog.show(getSupportFragmentManager(),"Failed");
                 }

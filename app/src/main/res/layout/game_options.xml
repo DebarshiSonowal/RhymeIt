@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@drawable/backgroundgameoption"
     app:layoutDescription="@xml/activity_main2_scene"
     tools:context=".GameOptions">
 
@@ -12,7 +12,7 @@
         android:id="@+id/animation_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#38C172"
+        android:background="#0038C172"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/guideline35"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,6 +23,7 @@
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/selectoption" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline27"
         android:layout_width="wrap_content"
@@ -92,8 +93,8 @@
         android:layout_height="44dp"
         android:gravity="center"
         android:text="Choose a level"
-        android:textColor="#000000"
-        android:textSize="24sp"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -102,12 +103,12 @@
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:cardBackgroundColor="#D6CECE"
+        app:cardBackgroundColor="#6A37A7"
         app:cardCornerRadius="20dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline33"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline34" >
+        app:layout_constraintTop_toTopOf="@+id/guideline34">
 
         <LinearLayout
             android:id="@+id/level1"
@@ -118,12 +119,12 @@
 
             <TextView
                 android:id="@+id/textView6"
-                android:layout_width="wrap_content"
+                android:layout_width="97dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Level  1"
-                android:textColor="#000000"
+                android:textColor="#FFFFFF"
                 android:textSize="24sp" />
 
             <me.zhanghai.android.materialprogressbar.MaterialProgressBar
@@ -139,12 +140,12 @@
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:cardBackgroundColor="#D6CECE"
+        app:cardBackgroundColor="#A7373C"
         app:cardCornerRadius="20dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline31"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline32" >
+        app:layout_constraintTop_toTopOf="@+id/guideline32">
 
         <LinearLayout
             android:id="@+id/level2"
@@ -155,12 +156,12 @@
 
             <TextView
                 android:id="@+id/textView12"
-                android:layout_width="wrap_content"
+                android:layout_width="94dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Level 2"
-                android:textColor="#000000"
+                android:textColor="#FFFFFF"
                 android:textSize="24sp" />
 
             <me.zhanghai.android.materialprogressbar.MaterialProgressBar
@@ -176,12 +177,12 @@
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:cardBackgroundColor="#D6CECE"
+        app:cardBackgroundColor="#74A737"
         app:cardCornerRadius="20dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline29"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline30" >
+        app:layout_constraintTop_toTopOf="@+id/guideline30">
 
         <LinearLayout
             android:id="@+id/level3"
@@ -192,12 +193,12 @@
 
             <TextView
                 android:id="@+id/textView14"
-                android:layout_width="wrap_content"
+                android:layout_width="94dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Level 3"
-                android:textColor="#000000"
+                android:textColor="#FFFFFF"
                 android:textSize="24sp" />
 
             <me.zhanghai.android.materialprogressbar.MaterialProgressBar
@@ -213,12 +214,12 @@
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:cardBackgroundColor="#D6CECE"
+        app:cardBackgroundColor="#37A7A2"
         app:cardCornerRadius="20dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline27"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline28" >
+        app:layout_constraintTop_toTopOf="@+id/guideline28">
 
         <LinearLayout
             android:id="@+id/level4"
@@ -229,12 +230,12 @@
 
             <TextView
                 android:id="@+id/textView15"
-                android:layout_width="wrap_content"
+                android:layout_width="94dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Level 4"
-                android:textColor="#000000"
+                android:textColor="#FFFFFF"
                 android:textSize="24sp" />
 
             <me.zhanghai.android.materialprogressbar.MaterialProgressBar

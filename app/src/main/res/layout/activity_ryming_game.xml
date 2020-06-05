@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".RhymingGame">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#283D4B"
+    tools:context=".RhymingGame">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -66,12 +67,15 @@ tools:context=".RhymingGame">
         android:id="@+id/listview"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@drawable/backgroundchat"
         android:divider="@null"
         android:dividerHeight="10dp"
         android:padding="10dp"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
         android:scrollbars="vertical"
+        android:transcriptMode="alwaysScroll"
+        android:stackFromBottom="true"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -84,14 +88,14 @@ tools:context=".RhymingGame">
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.91" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.11" />
+        app:layout_constraintGuide_percent="0.08" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline5"
@@ -104,7 +108,7 @@ tools:context=".RhymingGame">
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#000000"
+        android:background="#284B48"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -156,7 +160,7 @@ tools:context=".RhymingGame">
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        app:layout_constraintGuide_begin="239dp" />
+                        app:layout_constraintGuide_begin="260dp" />
 
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guideline17"
@@ -172,21 +176,21 @@ tools:context=".RhymingGame">
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_begin="7dp" />
+                app:layout_constraintGuide_begin="5dp" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_begin="69dp" />
+                app:layout_constraintGuide_begin="70dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.github.nikartm.button.FitButton
             android:id="@+id/fbtn"
             android:layout_width="78dp"
-            android:layout_height="73dp"
+            android:layout_height="match_parent"
             android:enabled="true"
             android:gravity="center"
             app:fb_cornerRadius="2dp"
@@ -206,7 +210,7 @@ tools:context=".RhymingGame">
         <com.github.nikartm.button.FitButton
             android:id="@+id/fbtn2"
             android:layout_width="78dp"
-            android:layout_height="73dp"
+            android:layout_height="match_parent"
             android:enabled="true"
             android:gravity="center"
             app:fb_cornerRadius="2dp"
@@ -232,8 +236,8 @@ tools:context=".RhymingGame">
         app:cpb_background_progressbar_color="#000000"
         app:cpb_background_progressbar_width="5dp"
         app:cpb_progress_direction="to_right"
-        app:cpb_progressbar_color="#FFFFFF"
-        app:cpb_progressbar_width="10dp"
+        app:cpb_progressbar_color="#FF0000"
+        app:cpb_progressbar_width="5dp"
         app:cpb_round_border="false"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toStartOf="@+id/guideline5"
@@ -250,10 +254,10 @@ tools:context=".RhymingGame">
         android:layout_height="0dp"
         android:background="#FFD900"
         android:gravity="center"
-        android:text="Score: "
+        android:text="Score: 0/10"
         android:textAlignment="center"
         android:textColor="#000000"
-        android:textSize="24sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toEndOf="parent"

@@ -3,14 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="390dp"
+    android:layout_height="420dp"
+    android:background="@drawable/backgroundsucccessful"
     tools:context=".Successful_dialog">
+
+    <com.skydoves.elasticviews.ElasticImageView
+        android:id="@+id/scoreshow2"
+        android:layout_width="69dp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="32dp"
+
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_scoreboard"
+        app:imageView_duration="300"
+        app:imageView_scale="0.7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline45"
+        app:layout_constraintVertical_bias="0.388" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/animation_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#00FF04"
+        android:background="#0000FF04"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/guideline9"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.62" />
+        app:layout_constraintGuide_percent="0.46" />
 
     <TextView
         android:id="@+id/textView3"
@@ -35,8 +53,8 @@
         android:layout_height="0dp"
         android:gravity="center"
         android:text="You have completed level "
-        android:textColor="#000000"
-        android:textSize="24sp"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/guideline10"
         app:layout_constraintEnd_toEndOf="parent"
@@ -49,17 +67,35 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.79" />
+        app:layout_constraintGuide_percent="0.59" />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="251dp"
         android:layout_height="50dp"
         android:gravity="center"
-        android:textColor="#000000"
-        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline10"
+        app:layout_constraintVertical_bias="0.093" />
+
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="152dp"
+        android:layout_height="28dp"
+        android:gravity="center"
+        android:text="See score"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline10" />
+        app:layout_constraintTop_toBottomOf="@+id/scoreshow2"
+        app:layout_constraintVertical_bias="1.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

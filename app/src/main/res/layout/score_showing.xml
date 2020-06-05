@@ -2,17 +2,18 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/const1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:background="#EFE6E6"
+    android:background="@drawable/backgroundscoreshowing"
     tools:context=".ScoreShowing">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/animation_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#8954FE"
+        android:background="#008954FE"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/guideline11"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,16 +23,18 @@
         app:layout_constraintVertical_bias="1.0"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        app:lottie_rawRes="@raw/success" />
+        app:lottie_rawRes="@raw/completed" />
 
     <com.skydoves.elasticviews.ElasticButton
         android:id="@+id/playagainbtn"
-        android:layout_width="121dp"
-        android:layout_height="40dp"
+        android:layout_width="152dp"
+        android:layout_height="50dp"
+        android:background="#F4B042"
         android:text="Play again"
         android:textColor="@android:color/white"
-        android:textSize="14sp"
-        app:button_cornerRadius="4dp"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:button_cornerRadius="20dp"
         app:button_duration="250"
         app:button_scale="0.87"
         app:layout_constraintBottom_toTopOf="@+id/guideline21"
@@ -50,23 +53,17 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline14"
         app:layout_constraintStart_toStartOf="@+id/guideline13"
         app:layout_constraintTop_toTopOf="@+id/guideline11"
-
-
         app:line_count="30"
         app:line_width="4dp"
-
-        app:progress_background_color="#353333"
+        app:progress_background_color="#FBFBFB"
         app:progress_shader="sweep"
         app:progress_start_color="#ff0008"
         app:progress_start_degree="-90"
         app:progress_stroke_cap="round"
-
-        app:progress_stroke_width="1dp"
-
-        app:progress_text_color="#000000"
-
-        app:progress_text_size="18dp"
-        app:style="line" />
+        app:progress_stroke_width="4dp"
+        app:progress_text_color="#FFFFFF"
+        app:progress_text_size="36dp"
+        app:style="solid_line" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline11"
@@ -102,7 +99,9 @@
         android:layout_height="64dp"
         android:gravity="center"
         android:textAlignment="center"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/guideline12"
         app:layout_constraintEnd_toStartOf="@+id/line_progress"
         app:layout_constraintHorizontal_bias="0.551"
@@ -115,8 +114,11 @@
         android:layout_width="94dp"
         android:layout_height="64dp"
         android:gravity="center"
+        android:text="10"
         android:textAlignment="center"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/guideline12"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.36"
@@ -128,7 +130,7 @@
         android:id="@+id/constraintLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#E3DADA"
+        android:background="#A66284BC"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -167,7 +169,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:cardBackgroundColor="#FFFFFF"
+            app:cardBackgroundColor="#F11267"
             app:cardCornerRadius="20dp"
             app:layout_constraintBottom_toTopOf="@+id/guideline22"
             app:layout_constraintEnd_toEndOf="parent"
@@ -191,7 +193,7 @@
                     android:layout_weight="1"
                     android:gravity="center|start"
                     android:text="Facebook"
-                    android:textColor="#000000"
+                    android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -200,7 +202,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:cardBackgroundColor="#FFFFFF"
+            app:cardBackgroundColor="#42F457"
             app:cardCornerRadius="20dp"
             app:layout_constraintBottom_toTopOf="@+id/guideline25"
             app:layout_constraintEnd_toEndOf="parent"
@@ -215,7 +217,7 @@
 
                 <ImageView
                     android:id="@+id/whatsappshare"
-                    android:layout_width="210dp"
+                    android:layout_width="184dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     app:srcCompat="@drawable/ic_whatsapp" />
@@ -239,8 +241,8 @@
             android:layout_height="0dp"
             android:text="Share to"
             android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/guideline24"
             app:layout_constraintEnd_toEndOf="parent"
@@ -271,7 +273,7 @@
         android:gravity="center"
         android:text="Your Score"
         android:textAlignment="center"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/guideline26"
@@ -287,7 +289,7 @@
         android:layout_height="27dp"
         android:gravity="center"
         android:text="Target"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/guideline26"

@@ -132,7 +132,6 @@
                 style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:indeterminate="true"
                 app:mpb_progressStyle="horizontal" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -169,7 +168,6 @@
                 style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:indeterminate="true"
                 app:mpb_progressStyle="horizontal" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -206,7 +204,6 @@
                 style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:indeterminate="true"
                 app:mpb_progressStyle="horizontal" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -243,7 +240,6 @@
                 style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:indeterminate="true"
                 app:mpb_progressStyle="horizontal" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

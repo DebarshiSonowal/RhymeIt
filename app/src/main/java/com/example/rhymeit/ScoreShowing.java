@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dinuscxj.progressbar.CircleProgressBar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.skydoves.elasticviews.ElasticButton;
 
 import java.net.URL;
@@ -22,6 +23,7 @@ CircleProgressBar mCircleProgressBar;
 ElasticButton playagain;
 TextView score,target;
 ImageView whatsapp,facebook;
+FirebaseAuth mFirebaseAuth;
 int i;
     public static final String name ="Progress";
     @Override
@@ -58,11 +60,11 @@ int i;
         whatsapp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
+                intent.setPackage("com.whatsapp");
                 intent.putExtra(Intent.EXTRA_TEXT,"Hey look my new high score: "+i+". Can you beat my score ? \n"+"http://play.google.com/store/apps/details?id=" + getPackageName());
-                startActivity(intent.createChooser(intent,"Share it"));
+                startActivity(intent);
 
             }
         });
@@ -72,7 +74,10 @@ int i;
         facebook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT,"Hey look my new high score: "+i+". Can you beat my score ? \n"+"http://play.google.com/store/apps/details?id=" + getPackageName());
+                startActivity(intent.createChooser(intent,"Share it"));
             }
         });
 

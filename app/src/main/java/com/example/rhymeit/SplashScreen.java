@@ -36,7 +36,7 @@ Animation top,bottom;
             @Override
             public void run() {
 
-                Intent intent = new Intent(SplashScreen.this,Home.class);
+                Intent intent = new Intent(SplashScreen.this,login.class);
                 startActivity(intent);
                 finish();
             }

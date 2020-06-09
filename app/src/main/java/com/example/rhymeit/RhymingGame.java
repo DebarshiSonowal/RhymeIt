@@ -2,18 +2,22 @@ package com.example.rhymeit;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -29,6 +33,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.nikartm.button.FitButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
@@ -36,22 +43,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
-public class RhymingGame extends AppCompatActivity {
+public class RhymingGame<pubic> extends AppCompatActivity {
     final String URl1 = "https://api.datamuse.com/words?";
     final String URl = "https://api.datamuse.com/words?sp=";
     private static final long START_TIME_IN_MILLIS = 30000;
+    FirebaseFirestore db;
     //Atanas Nikolaev
     private static long TIMER;
     private CountDownTimer mCountDownTimer;
-    String URL3, URL2, url;
+    String URL3, URL2, url,uid;
     private RequestQueue mRequestQueue;
-
     ProgressBar mProgressBar;
     Animation blink;
     ImageView first, second, third;
@@ -67,6 +77,9 @@ public class RhymingGame extends AppCompatActivity {
     int i = 0, j = 0,l;
     List<String> keywords;
     FitButton sendbtn,hintbtn;
+
+    DocumentReference note;
+    String finaltext,asd;
     public static final String name ="Progress";
     @Override
     protected void onDestroy() {
@@ -87,12 +100,42 @@ public class RhymingGame extends AppCompatActivity {
         second.startAnimation(blink);
         third.startAnimation(blink);
 
+
+
+
+        sendbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!TextUtils.isEmpty(userinput.getText())){
+                    url = dictionaryURl(userinput.getText().toString().toLowerCase().trim());
+                    try {
+                        MyDictionaryRequest myDictionaryRequest = new MyDictionaryRequest(RhymingGame.this);
+                        Log.d("Async","1Inside");
+                        asd = myDictionaryRequest.execute(url).get();
+                    } catch (ExecutionException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+//                    networking net = new networking(url);
+//                    net.run();
+                    NetworkTask mTask = new NetworkTask(RhymingGame.this,asd);
+                    Log.d("Async","2Inside");
+
+                    mTask.execute(userinput.getText().toString().toLowerCase().trim());
+
+                }else {
+                    Toast.makeText(RhymingGame.this,"Write something",Toast.LENGTH_SHORT).show();
+                }
+                userinput.setText("");
+            }
+        });
+
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ryming_game);
+        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Initialize keywords
         keywords = new ArrayList<>();
         keywords.add("buck");
@@ -100,7 +143,8 @@ public class RhymingGame extends AppCompatActivity {
         keywords.add("school");
         keywords.add("duck");
         keywords.add("holy");
-
+        db = FirebaseFirestore.getInstance();
+        note = db.document("UserProfile/"+uid);
         //Attach views
         mProgressBar = findViewById(R.id.progressBar);
         sendbtn = findViewById(R.id.fbtn);
@@ -129,65 +173,14 @@ public class RhymingGame extends AppCompatActivity {
             }
         });
 
-        sendbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!TextUtils.isEmpty(userinput.getText())){
-                    url = dictionaryURl(userinput.getText().toString());
-                    MyDictionaryRequest myDictionaryRequest = new MyDictionaryRequest(RhymingGame.this);
-                    try {
-                        String asd = myDictionaryRequest.execute(url).get();
-                        i= i+1;
-                        mProgressBar.setProgress(i);
-                       if(!checkIfUsed(userinput.getText().toString().toLowerCase())){
-                            if(asd != "null"){
-                                if (getNoChar(getLevelno()) <= userinput.getText().length()) {
-                                    if(checkRhyme(userinput.getText().toString().toLowerCase())){
-                                        mCountDownTimer.cancel();
-                                        l=l+1;
-                                        scoreview.setText("Score: "+l+"/"+"10");
-                                        SharedPreferences preferences = getSharedPreferences(name,MODE_PRIVATE);
-                                        SharedPreferences.Editor editor = preferences.edit();
-                                        editor.clear();
-                                        editor.putInt("score",l);
-                                        editor.apply();
-                                        if(mProgressBar.getProgress() == 10){
-                                            mCountDownTimer.cancel();
-                                            Successful_dialog dialog = new Successful_dialog();
-                                            dialog.show(getSupportFragmentManager(),"Successful");
-
-                                        }else{
-                                            sendTheMessage(userinput.getText().toString());
-                                            getReply();
-                                        }
-
-
-                                    }else {
-                                        FancyToast.makeText(RhymingGame.this,"It does not rhyme with other word",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
-                                        reduceLives();
-                                    }
-                                }else {
-                                    FancyToast.makeText(RhymingGame.this,"The minimum character criteria is "+getNoChar(getLevelno()),FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
-                                }
-                            }else {
-                                FancyToast.makeText(RhymingGame.this,"This is not a meaningful word",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
-                                reduceLives();
-                            }
-                       }else {
-                           FancyToast.makeText(RhymingGame.this,"You have used it",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
-                          reduceLives();
-                       }
-                       userinput.setText("");
-
-                    } catch (ExecutionException | InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                }else {
-                    Toast.makeText(RhymingGame.this,"Write something",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+//        sendbtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+////                InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+////                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+//
+//            }
+//        });
 
         //Get the first input from Computer
         Random random = new Random();
@@ -209,6 +202,69 @@ public class RhymingGame extends AppCompatActivity {
         }
         return no;
     }
+   class networking implements Runnable {
+       String url2;
+
+       public networking(String url2) {
+           this.url2 = url2;
+       }
+
+       @Override
+       public void run() {
+
+               MyDictionaryRequest myDictionaryRequest = new MyDictionaryRequest(RhymingGame.this);
+           try {
+               String asd = myDictionaryRequest.execute(url2).get();
+               i = i + 1;
+               mProgressBar.setProgress(i);
+               if (!checkIfUsed(userinput.getText().toString().toLowerCase())) {
+                   if (asd != "null") {
+                       if (getNoChar(getLevelno()) <= userinput.getText().length()) {
+                           if (checkRhyme(userinput.getText().toString().toLowerCase())) {
+                               mCountDownTimer.cancel();
+                               l = l + 1;
+                               scoreview.setText("Score: " + l + "/" + "10");
+                               SharedPreferences preferences = getSharedPreferences(name, MODE_PRIVATE);
+                               SharedPreferences.Editor editor = preferences.edit();
+                               editor.clear();
+                               editor.putInt("score", l);
+                               editor.apply();
+//                               if (mProgressBar.getProgress() == 10) {
+//                                   mCountDownTimer.cancel();
+//                                   Map<String, Object> score = new HashMap<>();
+//                                   score.put("level"+getLevelno(),l);
+////                                    db.collection("Score").document("level"+l).set(score);
+//                                   note.set(score);
+//                                   Successful_dialog dialog = new Successful_dialog();
+//                                   dialog.show(getSupportFragmentManager(), "Successful");
+//
+//                               } else {
+//                                   sendTheMessage(userinput.getText().toString());
+//                               }
+
+
+                           } else {
+                               FancyToast.makeText(RhymingGame.this, "It does not rhyme with other word", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
+                               reduceLives();
+                           }
+                       } else {
+                           FancyToast.makeText(RhymingGame.this, "The minimum character criteria is " + getNoChar(getLevelno()), FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+                       }
+                   } else {
+                       FancyToast.makeText(RhymingGame.this, "This is not a meaningful word", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+                       reduceLives();
+                   }
+               } else {
+                   FancyToast.makeText(RhymingGame.this, "You have used it", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+                   reduceLives();
+               }
+               userinput.setText("");
+
+           } catch (ExecutionException | InterruptedException e) {
+               e.printStackTrace();
+           }
+       }
+   }
 
     private int getLevelno() {
         return getIntent().getIntExtra("level",1);
@@ -240,6 +296,10 @@ public class RhymingGame extends AppCompatActivity {
 //
                 }else{
                     mCountDownTimer.cancel();
+                    Map<String, Object> score = new HashMap<>();
+                    score.put("level"+getLevelno(),l);
+//                                    db.collection("Score").document("level"+l).set(score);
+                    note.update(score);
                     FailedDialog dialog = new FailedDialog();
                     dialog.show(getSupportFragmentManager(),"Failed");
                 }
@@ -247,10 +307,8 @@ public class RhymingGame extends AppCompatActivity {
         }
     }
 
-    private void getReply() {
-        int l = used.size()-1;
-        String muri =used.get(l);
-        URL3 = URl + muri.substring(muri.length()-1)+"??";
+    private void getReply(String use) {
+        URL3 = URl + use+"??";
         Log.d("Reply",URL3);
         getRhymingWord(URL3);
     }
@@ -281,12 +339,16 @@ public class RhymingGame extends AppCompatActivity {
                                     editor.apply();
                                     if(mProgressBar.getProgress() == 10){
                                         mCountDownTimer.cancel();
+                                        Map<String, Object> score = new HashMap<>();
+                                        score.put("level"+getLevelno(),l);
+//                                    db.collection("Score").document("level"+l).set(score);
+                                        note.update(score);
                                         Successful_dialog dialog = new Successful_dialog();
                                         dialog.show(getSupportFragmentManager(),"Successful");
 
                                     }
 //                                    startTimer();
-                                    getReply();
+                                    getReply(jsonObject.getString("word"));
                                     break;
                                 }
                             }
@@ -301,38 +363,41 @@ public class RhymingGame extends AppCompatActivity {
             }
         });
         mRequestQueue.add(request);
+
     }
 
     private void getRhymingWord(String url3) {
-        final JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url3, null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        try {
-                            JSONArray jsonArray =response;
-                            for (int i=0;i<jsonArray.length();i++) {
-                                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                if(!checkIfUsed(jsonObject.getString("word"))){
-                                    Log.d("Reply",jsonObject.getString("word"));
-                                    messages.add(jsonObject.getString("word"));
-                                    direction.add(false);
-                                    used.add(jsonObject.getString("word"));
-                                    mAdapter.notifyDataSetChanged();
-                                    startTimer();
-                                    break;
-                                }
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
-        mRequestQueue.add(request);
+        rhyme rhyme = new rhyme(url3);
+        rhyme.run();
+//        final JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url3, null,
+//                new Response.Listener<JSONArray>() {
+//                    @Override
+//                    public void onResponse(JSONArray response) {
+//                        try {
+//                            JSONArray jsonArray =response;
+//                            for (int i=0;i<jsonArray.length();i++) {
+//                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                                if(!checkIfUsed(jsonObject.getString("word"))){
+//                                    Log.d("Reply",jsonObject.getString("word"));
+//                                    messages.add(jsonObject.getString("word"));
+//                                    direction.add(false);
+//                                    used.add(jsonObject.getString("word"));
+//                                    mAdapter.notifyDataSetChanged();
+//                                    startTimer();
+//                                    break;
+//                                }
+//                            }
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                error.printStackTrace();
+//            }
+//        });
+//        mRequestQueue.add(request);
     }
 
     private void sendTheMessage(String toString) {
@@ -340,6 +405,7 @@ public class RhymingGame extends AppCompatActivity {
         direction.add(true);
         used.add(toString);
         mAdapter.notifyDataSetChanged();
+        getReply(toString);
     }
 
     private boolean checkRhyme(String user) {
@@ -444,6 +510,10 @@ public class RhymingGame extends AppCompatActivity {
                     FancyToast.makeText(RhymingGame.this,"You have lost third life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
                 }else{
                     mCountDownTimer.cancel();
+                    Map<String, Object> score = new HashMap<>();
+                    score.put("level"+getLevelno(),l);
+//                                    db.collection("Score").document("level"+l).set(score);
+                    note.update(score);
                     FailedDialog dialog = new FailedDialog();
                     dialog.show(getSupportFragmentManager(),"Failed");
                 }
@@ -456,4 +526,144 @@ public class RhymingGame extends AppCompatActivity {
         final String word_id=word.toLowerCase();
         return "https://od-api.oxforddictionaries.com:443/api/v2/entries/" + language + "/" + word_id;
     }
-}
+    class rhyme implements Runnable{
+        String url3;
+
+        public rhyme(String url3) {
+            this.url3 = url3;
+        }
+
+        @Override
+        public void run() {
+            final JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url3, null,
+                    new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            try {
+                                JSONArray jsonArray =response;
+                                for (int i=0;i<jsonArray.length();i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    if(!checkIfUsed(jsonObject.getString("word"))){
+                                        Log.d("Reply",jsonObject.getString("word"));
+                                        messages.add(jsonObject.getString("word"));
+                                        direction.add(false);
+                                        used.add(jsonObject.getString("word"));
+                                        mAdapter.notifyDataSetChanged();
+                                        startTimer();
+                                        break;
+                                    }
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.printStackTrace();
+                }
+            });
+            mRequestQueue.add(request);
+        }
+    }
+    class NetworkTask extends AsyncTask<String, Integer, String> {
+        WeakReference<RhymingGame>mWeakReference;
+         String url,text,verified,asd;
+
+        public NetworkTask(RhymingGame activity,String asd) {
+            mWeakReference = new WeakReference<RhymingGame>(activity);
+            this.asd = asd;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            Log.d("Async","preexecute");
+            i=i+1;
+            mProgressBar.setProgress(i);
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            text = strings[0];
+            Log.d("Async","background");
+            if (asd != "null") {
+                if(!checkIfUsed(text)){
+                    if (getNoChar(getLevelno()) <= text.length()) {
+                        if (checkRhyme(text)) {
+                            Log.d("Async","Inside");
+                            verified = text;
+                        } else {
+                            Looper.prepare();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    FancyToast.makeText(RhymingGame.this, "It does not rhyme with other word", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+                                    reduceLives();
+                                }
+                            });
+
+                        }
+                    }else{
+                        Looper.prepare();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                FancyToast.makeText(RhymingGame.this, "The minimum character criteria is " + getNoChar(getLevelno()), FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+                            }
+                        });
+
+
+                    }
+                } else {
+                    Looper.prepare();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            FancyToast.makeText(RhymingGame.this, "You have used it", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+                            reduceLives();
+                        }
+                    });
+
+                }
+            } else {
+                Looper.prepare();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        FancyToast.makeText(RhymingGame.this, "This is not a meaningful word", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+                        reduceLives();
+                    }
+                });
+
+            }
+            return verified;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.d("Async","postexecute");
+                    mCountDownTimer.cancel();
+                    l = l + 1;
+                    scoreview.setText("Score: " + l + "/" + "10");
+                    if (mProgressBar.getProgress() == 10) {
+                        mCountDownTimer.cancel();
+                        Map<String, Object> score = new HashMap<>();
+                        score.put("level"+getLevelno(),l);
+//                                    db.collection("Score").document("level"+l).set(score);
+                        note.set(score);
+                        Successful_dialog dialog = new Successful_dialog();
+                        dialog.show(getSupportFragmentManager(), "Successful");
+
+                }
+                    else {
+                        sendTheMessage(s);
+                    }
+
+
+            }
+        }
+    }

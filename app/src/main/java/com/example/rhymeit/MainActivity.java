@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -26,6 +27,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.github.nikartm.button.FitButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
@@ -34,44 +39,49 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity{
-  final   String URl1 = "https://api.datamuse.com/words?";
- final String URl = "https://api.datamuse.com/words?sp=";
+    final String URl1 = "https://api.datamuse.com/words?";
+    final String URl = "https://api.datamuse.com/words?sp=";
     private static final long START_TIME_IN_MILLIS = 30000;
-    private static long TIMER ;
+    FirebaseFirestore db;
+    //Atanas Nikolaev
+    private static long TIMER;
     private CountDownTimer mCountDownTimer;
- String URL3,URL2,url;
+    String URL3, URL2, url,uid;
     private RequestQueue mRequestQueue;
-    ImageButton  sendbtn,hintbtn;
     ProgressBar mProgressBar;
     Animation blink;
-    ImageView first,second,third;
+    ImageView first, second, third;
     EditText userinput;
-    AnimationListener mAnimationListener;
+    TextView scoreview;
+    Animation.AnimationListener mAnimationListener;
     CircularProgressBar timecircle;
-    TextView vsview;
     ListView interactionlist;
-    List<String> used=new ArrayList<>();
-    List<String> messages=new ArrayList<>();
+    List<String> used = new ArrayList<>();
+    List<String> messages = new ArrayList<>();
     List<Boolean> direction = new ArrayList<>();
     Adapter mAdapter;
-    int i =0,j;
-
+    int i = 0, j = 0,l;
+    List<String> keywords;
+    FitButton sendbtn,hintbtn;
+    DocumentReference note;
+    public static final String name ="Progress";
     @Override
-    protected void onPause() {
-        super.onPause();
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        SharedPreferences sharedPreferences = getSharedPreferences("help",MODE_PRIVATE);
-        j = sharedPreferences.getInt("nohelp",0);
+    protected void onDestroy() {
+        super.onDestroy();
+        mCountDownTimer.cancel();
+        mCountDownTimer = null;
+        mProgressBar =null;
+        blink = null;
+        mAnimationListener = null;
+        timecircle =null;
+        System.gc();
     }
 
     @Override
@@ -82,159 +92,283 @@ public class MainActivity extends AppCompatActivity{
         third.startAnimation(blink);
 
     }
-    private void sendMessage() {
-        URL2 = URl1+"ml=duck&sp=b*";
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, URL2, null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        try {
-                            JSONArray jsonArray =response;
-                            Log.d("word","1");
-                            Random randomNumGen = new Random();
-                            int number = randomNumGen.nextInt(10);
-//                                mWordModel = new WordModel(jsonArray.getJSONObject(i).getString("word"),jsonArray.getJSONObject(i).getInt("score"),jsonArray.getJSONObject(i).getInt("numSyllables"));
-                            JSONObject jsonObject = jsonArray.getJSONObject(number);
-                            messages.add(jsonObject.getString("word"));
-                            Log.d("word",jsonObject.getString("word"));
-                            direction.add(false);
-                            used.add(jsonObject.getString("word"));
-                            mAdapter.notifyDataSetChanged();
-                            timecircle.setProgress(0);
-                            try {
-                                mCountDownTimer.cancel();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            TIMER = START_TIME_IN_MILLIS;
-                            timecircle.setProgressMax(START_TIME_IN_MILLIS);
-                            startTimer();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
-        mRequestQueue.add(request);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_ryming_game);
+        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        //Initialize keywords
+        keywords = new ArrayList<>();
+        keywords.add("buck");
+        keywords.add("home");
+        keywords.add("school");
+        keywords.add("duck");
+        keywords.add("holy");
+        db = FirebaseFirestore.getInstance();
+        note = db.document("UserProfile/"+uid);
+        //Attach views
         mProgressBar = findViewById(R.id.progressBar);
-        sendbtn = findViewById(R.id.sendbtn);
-        userinput = findViewById(R.id.userbox);
+        sendbtn = findViewById(R.id.fbtn);
+        userinput = findViewById(R.id.userbox2);
         timecircle = findViewById(R.id.circularProgressBar);
         interactionlist = findViewById(R.id.listview);
         mRequestQueue = Volley.newRequestQueue(this);
-        sendMessage();
-        hintbtn = findViewById(R.id.hintbtn);
-        mAdapter = new Adapter(this,messages,direction);
+        hintbtn = findViewById(R.id.fbtn2);
+        mAdapter = new Adapter(this, messages, direction);
         interactionlist.setAdapter(mAdapter);
         mProgressBar.setMax(10);
-        blink = AnimationUtils.loadAnimation(this,R.anim.blink);
+        timecircle.setProgressMax(START_TIME_IN_MILLIS);
+        scoreview = findViewById(R.id.scoreview2);
+        blink = AnimationUtils.loadAnimation(this, R.anim.blink);
         blink.setAnimationListener(mAnimationListener);
         first = findViewById(R.id.firstlive);
         second = findViewById(R.id.secondlive);
         third = findViewById(R.id.thirdlive);
-        j=0;
+        l=0;
+        //On click listener
         hintbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               updateHelp();
-               Toast.makeText(MainActivity.this,j+"",Toast.LENGTH_SHORT).show();
-                if (j<=3) {
-                    gethelp();
-                } else {
-                    FailedDialog dialog = new FailedDialog();
-                dialog.show(getSupportFragmentManager(),"Failed");
-                }
+                gethelp();
             }
         });
+
         sendbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (!TextUtils.isEmpty(userinput.getText())) {
+//                InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+//                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                if(!TextUtils.isEmpty(userinput.getText())){
                     url = dictionaryURl(userinput.getText().toString());
-                    MyDictionaryRequest myDictionaryRequest = new MyDictionaryRequest(MainActivity.this);
-                    try {
-                        first.setVisibility(View.INVISIBLE);
-                        first.clearAnimation();
-                        String asd = myDictionaryRequest.execute(url).get();
-                        checkRhyme(userinput.getText().toString());
-                        if ((!check(userinput.getText().toString().toLowerCase())) && (asd != "null") && (checkRhyme(userinput.getText().toString().toLowerCase()))) {
-                            Log.d("sfafa","inside");
-                           send();
-                            getreply();
-                            //                Alert Dialog
-                        } else {
-        //                    userinput.setText("");
-                            Log.d("sfafa","outside");
-                        }
-                    } catch (ExecutionException | InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    userinput.setText("");
-                }else{
+                   networking net = new networking(url);
+                    net.run();
+//                    MyDictionaryRequest myDictionaryRequest = new MyDictionaryRequest(RhymingGame.this);
+
+//                    try {
+//                        String asd = myDictionaryRequest.execute(url).get();
+//                        i= i+1;
+//                        mProgressBar.setProgress(i);
+//                       if(!checkIfUsed(userinput.getText().toString().toLowerCase())){
+//                            if(asd != "null"){
+//                                if (getNoChar(getLevelno()) <= userinput.getText().length()) {
+//                                    if(checkRhyme(userinput.getText().toString().toLowerCase())){
+//                                        mCountDownTimer.cancel();
+//                                        l=l+1;
+//                                        scoreview.setText("Score: "+l+"/"+"10");
+//                                        SharedPreferences preferences = getSharedPreferences(name,MODE_PRIVATE);
+//                                        SharedPreferences.Editor editor = preferences.edit();
+//                                        editor.clear();
+//                                        editor.putInt("score",l);
+//                                        editor.apply();
+//                                        if(mProgressBar.getProgress() == 10){
+//                                            mCountDownTimer.cancel();
+//                                            Successful_dialog dialog = new Successful_dialog();
+//                                            dialog.show(getSupportFragmentManager(),"Successful");
+//
+//                                        }else{
+//                                            sendTheMessage(userinput.getText().toString());
+//                                            getReply();
+//                                        }
+//
+//
+//                                    }else {
+//                                        FancyToast.makeText(RhymingGame.this,"It does not rhyme with other word",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
+//                                        reduceLives();
+//                                    }
+//                                }else {
+//                                    FancyToast.makeText(RhymingGame.this,"The minimum character criteria is "+getNoChar(getLevelno()),FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+//                                }
+//                            }else {
+//                                FancyToast.makeText(RhymingGame.this,"This is not a meaningful word",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+//                                reduceLives();
+//                            }
+//                       }else {
+//                           FancyToast.makeText(RhymingGame.this,"You have used it",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+//                          reduceLives();
+//                       }
+//                       userinput.setText("");
+//
+//                    } catch (ExecutionException | InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+
+                }else {
                     Toast.makeText(MainActivity.this,"Write something",Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        //Get the first input from Computer
+        Random random = new Random();
+
+        getinput(random.nextInt(4));
+
     }
 
-    private void updateHelp() {
+    private int getNoChar(int levelno) {
+        int no;
+        if(levelno == 1){
+            no = 0;
+        }else if(levelno == 2){
+            no = 3;
+        }else if(levelno == 3) {
+            no = 4;
+        }else {
+            no =5;
+        }
+        return no;
+    }
+    class networking implements Runnable {
+        String url2;
 
+        public networking(String url2) {
+            this.url2 = url2;
+        }
+
+        @Override
+        public void run() {
+
+            MyDictionaryRequest myDictionaryRequest = new MyDictionaryRequest(MainActivity.this);
+            try {
+                String asd = myDictionaryRequest.execute(url2).get();
+                i = i + 1;
+                mProgressBar.setProgress(i);
+                if (!checkIfUsed(userinput.getText().toString().toLowerCase())) {
+                    if (asd != "null") {
+                        if (getNoChar(getLevelno()) <= userinput.getText().length()) {
+                            if (checkRhyme(userinput.getText().toString().toLowerCase())) {
+                                mCountDownTimer.cancel();
+                                l = l + 1;
+                                scoreview.setText("Score: " + l + "/" + "10");
+                                SharedPreferences preferences = getSharedPreferences(name, MODE_PRIVATE);
+                                SharedPreferences.Editor editor = preferences.edit();
+                                editor.clear();
+                                editor.putInt("score", l);
+                                editor.apply();
+                                if (mProgressBar.getProgress() == 10) {
+                                    mCountDownTimer.cancel();
+                                    Map<String, Object> score = new HashMap<>();
+                                    score.put("level"+getLevelno(),l);
+//                                    db.collection("Score").document("level"+l).set(score);
+                                    note.set(score);
+                                    Successful_dialog dialog = new Successful_dialog();
+                                    dialog.show(getSupportFragmentManager(), "Successful");
+
+                                } else {
+                                    sendTheMessage(userinput.getText().toString());
+                                    getReply();
+                                }
+
+
+                            } else {
+                                FancyToast.makeText(MainActivity.this, "It does not rhyme with other word", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
+                                reduceLives();
+                            }
+                        } else {
+                            FancyToast.makeText(MainActivity.this, "The minimum character criteria is " + getNoChar(getLevelno()), FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+                        }
+                    } else {
+                        FancyToast.makeText(MainActivity.this, "This is not a meaningful word", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+                        reduceLives();
+                    }
+                } else {
+                    FancyToast.makeText(MainActivity.this, "You have used it", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
+                    reduceLives();
+                }
+                userinput.setText("");
+
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    private void send() {
-        messages.add(userinput.getText().toString().toLowerCase());
-        direction.add(true);
-        used.add(userinput.getText().toString().toLowerCase());
-        mAdapter.notifyDataSetChanged();
+    private int getLevelno() {
+        return getIntent().getIntExtra("level",1);
     }
 
     private void gethelp() {
-        j = j+1;
-        SharedPreferences preferences = getSharedPreferences("help",MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("nohelp",j);
-        editor.commit();
         int l = used.size()-1;
-        String muri = used.get(l);
+        String muri =used.get(l);
         URL3 = URl + muri.substring(muri.length()-1)+"??";
-        JsonParse1(URL3);
+        Log.d("Reply",URL3);
+        getRhymingWordHelp(URL3);
+
     }
 
-    private void JsonParse1(String url3) {
-        final JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
+    private void reduceLives() {
+        if (first.getVisibility() == View.VISIBLE) {
+            first.setVisibility(View.INVISIBLE);
+            first.clearAnimation();
+//            FancyToast.makeText(RhymingGame.this,"You have lost first life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+        }else{
+            if (second.getVisibility() == View.VISIBLE){
+                second.setVisibility(View.INVISIBLE);
+                second.clearAnimation();
+//                FancyToast.makeText(RhymingGame.this,"You have lost second life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+            }else {
+                if(third.getVisibility() == View.VISIBLE){
+                    third.setVisibility(View.INVISIBLE);
+                    third.clearAnimation();
+//
+                }else{
+                    mCountDownTimer.cancel();
+                    Map<String, Object> score = new HashMap<>();
+                    score.put("level"+getLevelno(),l);
+//                                    db.collection("Score").document("level"+l).set(score);
+                    note.update(score);
+                    FailedDialog dialog = new FailedDialog();
+                    dialog.show(getSupportFragmentManager(),"Failed");
+                }
+            }
+        }
+    }
+
+    private void getReply() {
+        int l = used.size()-1;
+        String muri =used.get(l);
+        URL3 = URl + muri.substring(muri.length()-1)+"??";
+        Log.d("Reply",URL3);
+        getRhymingWord(URL3);
+    }
+
+    private void getRhymingWordHelp(String url3) {
+        final JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url3, null,
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
                         try {
                             JSONArray jsonArray =response;
                             for (int i=0;i<jsonArray.length();i++) {
-//                                mWordModel = new WordModel(jsonArray.getJSONObject(i).getString("word"),jsonArray.getJSONObject(i).getInt("score"),jsonArray.getJSONObject(i).getInt("numSyllables"));
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                if(!check(jsonObject.getString("word"))){
+                                if(!checkIfUsed(jsonObject.getString("word"))){
+                                    Log.d("Reply",jsonObject.getString("word"));
                                     messages.add(jsonObject.getString("word"));
                                     direction.add(true);
                                     used.add(jsonObject.getString("word"));
                                     mAdapter.notifyDataSetChanged();
-                                    timecircle.setProgress(0);
-                                    try {
+                                    i= i+1;
+                                    mProgressBar.setProgress(i);
+                                    l=l+1;
+                                    scoreview.setText("Score: "+l+"/"+"10");
+                                    SharedPreferences preferences = getSharedPreferences(name,MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = preferences.edit();
+                                    editor.clear();
+                                    editor.putInt("score",l);
+                                    editor.apply();
+                                    if(mProgressBar.getProgress() == 10){
                                         mCountDownTimer.cancel();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
+                                        Map<String, Object> score = new HashMap<>();
+                                        score.put("level"+getLevelno(),l);
+//                                    db.collection("Score").document("level"+l).set(score);
+                                        note.update(score);
+                                        Successful_dialog dialog = new Successful_dialog();
+                                        dialog.show(getSupportFragmentManager(),"Successful");
+
                                     }
-                                    TIMER = START_TIME_IN_MILLIS;
-                                    timecircle.setProgressMax(START_TIME_IN_MILLIS);
-                                    startTimer();
+//                                    startTimer();
+                                    getReply();
                                     break;
                                 }
                             }
@@ -252,8 +386,48 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
+    private void getRhymingWord(String url3) {
+       rhyme rhyme = new rhyme(url3);
+        rhyme.run();
+//        final JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url3, null,
+//                new Response.Listener<JSONArray>() {
+//                    @Override
+//                    public void onResponse(JSONArray response) {
+//                        try {
+//                            JSONArray jsonArray =response;
+//                            for (int i=0;i<jsonArray.length();i++) {
+//                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                                if(!checkIfUsed(jsonObject.getString("word"))){
+//                                    Log.d("Reply",jsonObject.getString("word"));
+//                                    messages.add(jsonObject.getString("word"));
+//                                    direction.add(false);
+//                                    used.add(jsonObject.getString("word"));
+//                                    mAdapter.notifyDataSetChanged();
+//                                    startTimer();
+//                                    break;
+//                                }
+//                            }
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                error.printStackTrace();
+//            }
+//        });
+//        mRequestQueue.add(request);
+    }
 
-    private Boolean checkRhyme(String user) {
+    private void sendTheMessage(String toString) {
+        messages.add(toString);
+        direction.add(true);
+        used.add(toString);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private boolean checkRhyme(String user) {
         int l = used.size()-1;
         String muri = used.get(l);
         Character ch=  muri.charAt(muri.length()-1);
@@ -263,14 +437,7 @@ public class MainActivity extends AppCompatActivity{
         return false;
     }
 
-    private void getreply() {
-        int l = used.size()-1;
-        String muri = used.get(l);
-        URL3 = URl + muri.substring(muri.length()-1)+"??";
-        JsonParse(URL3);
-    }
-
-    private Boolean check(String toString) {
+    private boolean checkIfUsed(String toString) {
         for(int j=0;j<used.size();j++)
         {
             if(toString.equals(used.get(j))){
@@ -280,33 +447,23 @@ public class MainActivity extends AppCompatActivity{
         return false;
     }
 
-    private void JsonParse(String url) {
-        final JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
+    private void getinput(int nextInt) {
+        String string = keywords.get(nextInt);
+        URL2 = URl1 + "ml=" + string.toLowerCase() + "&sp=b*";
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, URL2, null,
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
                         try {
-                            JSONArray jsonArray =response;
-                            for (int i=0;i<jsonArray.length();i++) {
-//                                mWordModel = new WordModel(jsonArray.getJSONObject(i).getString("word"),jsonArray.getJSONObject(i).getInt("score"),jsonArray.getJSONObject(i).getInt("numSyllables"));
-                                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                if(!check(jsonObject.getString("word"))){
-                                    messages.add(jsonObject.getString("word"));
-                                    direction.add(false);
-                                    used.add(jsonObject.getString("word"));
-                                    mAdapter.notifyDataSetChanged();
-                                    timecircle.setProgress(0);
-                                    try {
-                                        mCountDownTimer.cancel();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    TIMER = START_TIME_IN_MILLIS;
-                                    timecircle.setProgressMax(START_TIME_IN_MILLIS);
-                                    startTimer();
-                                    break;
-                                }
-                            }
+                            JSONArray jsonArray = response;
+                            Log.d("word", "1");
+                            Random randomNumGen = new Random();
+                            int number = randomNumGen.nextInt(10);
+                            JSONObject jsonObject = jsonArray.getJSONObject(number);
+                            Log.d("word",jsonObject.getString("word")+"1");
+                            startTimer();
+                            getMessage(jsonObject.getString("word"));
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -321,52 +478,112 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
-    private void startTimer() {
-       mCountDownTimer = new CountDownTimer(TIMER,1000) {
-           @Override
-           public void onTick(long millisUntilFinished) {
-                    TIMER = millisUntilFinished;
-               timecircle.setBackgroundProgressBarColor(Color.BLACK);
-                    timecircle.setProgress(TIMER);
-           }
+    private void getMessage(String word) {
+        messages.add(word);
+        Log.d("word", word+"2");
+        direction.add(false);
+        used.add(word);
+        mAdapter.notifyDataSetChanged();
+    }
 
-           @Override
-           public void onFinish() {
-               FancyToast.makeText(MainActivity.this,"You have used it",FancyToast.LENGTH_SHORT,FancyToast.WARNING,false).show();
-               if (first.getVisibility() == View.VISIBLE) {
-                   first.setVisibility(View.INVISIBLE);
-                   first.clearAnimation();
-                   gethelp();
-               }else{
-                   if (second.getVisibility() == View.VISIBLE){
-                       second.setVisibility(View.INVISIBLE);
-                       second.clearAnimation();
-                       gethelp();
-                   }else {
-                       if(third.getVisibility() == View.VISIBLE){
-                           third.setVisibility(View.INVISIBLE);
-                           third.clearAnimation();
-                           gethelp();
-                       }else{
-                           FailedDialog dialog = new FailedDialog();
-                           dialog.show(getSupportFragmentManager(),"Failed");
-                       }
-                   }
-               }
-           }
-       };
-       mCountDownTimer.start();
-        i= i+1;
-        mProgressBar.setProgress(i);
+    private void startTimer() {
+        timecircle.setProgress(0);
+        try {
+            mCountDownTimer.cancel();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mCountDownTimer  = new CountDownTimer(START_TIME_IN_MILLIS,1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                TIMER = millisUntilFinished;
+                timecircle.setBackgroundProgressBarColor(Color.BLACK);
+                timecircle.setProgress(TIMER);
+
+            }
+
+            @Override
+            public void onFinish() {
+                reduceLives1();
+            }
+
+        };
+        mCountDownTimer.start();
+
+    }
+
+    private void reduceLives1() {
+        if (first.getVisibility() == View.VISIBLE) {
+            first.setVisibility(View.INVISIBLE);
+            first.clearAnimation();
+            FancyToast.makeText(MainActivity.this,"You have lost first life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+        }else{
+            if (second.getVisibility() == View.VISIBLE){
+                second.setVisibility(View.INVISIBLE);
+                second.clearAnimation();
+                FancyToast.makeText(MainActivity.this,"You have lost second life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+            }else {
+                if(third.getVisibility() == View.VISIBLE){
+                    third.setVisibility(View.INVISIBLE);
+                    third.clearAnimation();
+                    FancyToast.makeText(MainActivity.this,"You have lost third life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+                }else{
+                    mCountDownTimer.cancel();
+                    Map<String, Object> score = new HashMap<>();
+                    score.put("level"+getLevelno(),l);
+//                                    db.collection("Score").document("level"+l).set(score);
+                    note.update(score);
+                    FailedDialog dialog = new FailedDialog();
+                    dialog.show(getSupportFragmentManager(),"Failed");
+                }
+            }
+        }
     }
 
     private String dictionaryURl(String word){
         final String language = "en";
-       final String word_id=word.toLowerCase();
+        final String word_id=word.toLowerCase();
         return "https://od-api.oxforddictionaries.com:443/api/v2/entries/" + language + "/" + word_id;
     }
+    class rhyme implements Runnable{
+        String url3;
 
+        public rhyme(String url3) {
+            this.url3 = url3;
+        }
 
-
+        @Override
+        public void run() {
+            final JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url3, null,
+                    new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            try {
+                                JSONArray jsonArray =response;
+                                for (int i=0;i<jsonArray.length();i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    if(!checkIfUsed(jsonObject.getString("word"))){
+                                        Log.d("Reply",jsonObject.getString("word"));
+                                        messages.add(jsonObject.getString("word"));
+                                        direction.add(false);
+                                        used.add(jsonObject.getString("word"));
+                                        mAdapter.notifyDataSetChanged();
+                                        startTimer();
+                                        break;
+                                    }
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.printStackTrace();
+                }
+            });
+            mRequestQueue.add(request);
+        }
+    }
 }
 

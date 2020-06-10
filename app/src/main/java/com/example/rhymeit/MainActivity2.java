@@ -3,6 +3,7 @@ package com.example.rhymeit;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -206,6 +207,9 @@ public class MainActivity2 extends AppCompatActivity {
                                         score.put("level"+getLevelno(),l);
                                         //                                    db.collection("Score").document("level"+l).set(score);
                                         note.set(score);
+                                        SharedPreferences sharedPreferences = getSharedPreferences("Progress",MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                                        editor.putInt("score",l);
                                         Successful_dialog dialog = new Successful_dialog();
                                         dialog.show(getSupportFragmentManager(), "Successful");
 
@@ -313,6 +317,9 @@ public class MainActivity2 extends AppCompatActivity {
                     score.put("level"+getLevelno(),l);
 //                                    db.collection("Score").document("level"+l).set(score);
                     note.update(score);
+                    SharedPreferences sharedPreferences = getSharedPreferences("Progress",MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putInt("score",l);
                     FailedDialog dialog = new FailedDialog();
                     dialog.show(getSupportFragmentManager(),"Failed");
                 }
@@ -341,6 +348,9 @@ public class MainActivity2 extends AppCompatActivity {
                     score.put("level"+getLevelno(),l);
 //                                    db.collection("Score").document("level"+l).set(score);
                     note.update(score);
+                    SharedPreferences sharedPreferences = getSharedPreferences("Progress",MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putInt("score",l);
                     FailedDialog dialog = new FailedDialog();
                     dialog.show(getSupportFragmentManager(),"Failed");
                 }
@@ -404,9 +414,9 @@ public class MainActivity2 extends AppCompatActivity {
 
     private boolean checkRhyme(String user) {
         int l = used.size()-1;
-        String muri = used.get(l);
+        String muri = used.get(l).toLowerCase();
         Character ch=  muri.charAt(muri.length()-1);
-        if(ch == user.charAt(0)){
+        if(ch == user.toLowerCase().charAt(0)){
             return true;
         }
         return false;
@@ -427,11 +437,11 @@ public class MainActivity2 extends AppCompatActivity {
         if(levelno == 1){
             no = 0;
         }else if(levelno == 2){
-            no = 3;
+            no = 2;
         }else if(levelno == 3) {
-            no = 4;
+            no = 3;
         }else {
-            no =5;
+            no =4;
         }
         return no;
     }
@@ -584,6 +594,9 @@ public class MainActivity2 extends AppCompatActivity {
                     score.put("level"+getLevelno(),l);
     //                                    db.collection("Score").document("level"+l).set(score);
                     note.set(score);
+                    SharedPreferences sharedPreferences = getSharedPreferences("Progress",MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putInt("score",l);
                     Successful_dialog dialog = new Successful_dialog();
                     dialog.show(getSupportFragmentManager(), "Successful");
 

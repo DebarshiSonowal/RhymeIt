@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.nikartm.button.FitButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,7 +31,7 @@ import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
 public class signup extends AppCompatActivity {
     EditText  txtUserName,txtEmail, txtPassword, txtConfirmPassword;
-    CircularProgressButton btn_register,btn_login;
+    FitButton btn_register,btn_login;
     CheckBox agree;
     private FirebaseAuth firebaseAuth;
     DatabaseReference databaseReference;
@@ -54,9 +55,8 @@ public class signup extends AppCompatActivity {
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btn_login.startAnimation();
                 startActivity(new Intent(signup.this,login.class));
-                btn_login.stopAnimation();
+
 //                btn_login.doneLoadingAnimation();
             }
         });
@@ -64,7 +64,6 @@ public class signup extends AppCompatActivity {
         btn_register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btn_register.startAnimation();
                 final String userName = txtUserName.getText().toString().trim();
                 final String email = txtEmail.getText().toString().trim();
                 String password = txtPassword.getText().toString().trim();
@@ -91,7 +90,7 @@ public class signup extends AppCompatActivity {
                     return;
                 }
                 if(!agree.isChecked()){
-                    Toast.makeText(signup.this, "You have not agreed to our times and conditions", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(signup.this, "You have not agreed to our Terms & Conditions", Toast.LENGTH_SHORT).show();
                     return;
                 }
 

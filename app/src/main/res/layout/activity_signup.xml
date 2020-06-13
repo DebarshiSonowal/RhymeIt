@@ -32,8 +32,8 @@
         app:fb_shape="rectangle"
         app:fb_text="Log in"
         app:fb_textColor="#000000"
-        app:fb_textPaddingStart="16dp"
-        app:fb_textSize="24dp"
+        app:fb_textPaddingStart="10dp"
+        app:fb_textSize="@dimen/_20sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,8 +64,8 @@
         app:fb_shape="rectangle"
         app:fb_text="Sign up"
         app:fb_textColor="#000000"
-        app:fb_textPaddingStart="16dp"
-        app:fb_textSize="24dp"
+        app:fb_textPaddingStart="10dp"
+        app:fb_textSize="@dimen/_20sdp"
         app:layout_constraintTop_toTopOf="@+id/guideline63"
         tools:layout_editor_absoluteX="16dp" />
 
@@ -223,7 +223,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.531"
-                app:passwordToggleEnabled="true">
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="#000000">
 
                 <EditText
                     android:id="@+id/txt_password"
@@ -272,7 +273,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.673"
-                app:passwordToggleEnabled="true">
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="#000000">
 
                 <EditText
                     android:id="@+id/txt_confirm_password"
@@ -310,21 +312,21 @@
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toTopOf="@+id/guideline63"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.862"
+        app:layout_constraintHorizontal_bias="0.698"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/TandCview"
-        android:layout_width="120dp"
-        android:layout_height="25dp"
-        android:layout_marginBottom="12dp"
+        android:layout_width="221dp"
+        android:layout_height="47dp"
         android:gravity="center"
-        android:text="T&amp;C"
+        android:text="Terms &amp; Conditions"
         android:textColor="#000000"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/guideline63"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

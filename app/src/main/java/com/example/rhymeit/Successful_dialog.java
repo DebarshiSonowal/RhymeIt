@@ -25,12 +25,13 @@ public class Successful_dialog extends AppCompatDialogFragment {
     TextView score;
     ElasticImageView scoreviewer;
     public static final String name ="Progress";
-    int i;
+    int i,l;
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         SharedPreferences preferences = getActivity().getSharedPreferences(name, getActivity().MODE_PRIVATE);
          i= preferences.getInt("score",0);
+         l = preferences.getInt("level",1);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),AlertDialog.THEME_HOLO_LIGHT);
         final LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.activity_successful_dialog, null);
@@ -45,6 +46,7 @@ public class Successful_dialog extends AppCompatDialogFragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), ScoreShowing.class);
                 intent.putExtra("score",i);
+                intent.putExtra("level",l);
                 startActivity(intent);
                 scoreviewer.clearAnimation();
             }

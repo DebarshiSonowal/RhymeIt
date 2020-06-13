@@ -118,6 +118,7 @@ public class signup extends AppCompatActivity {
                                         note.put("level3",0);
                                         note.put("level4",0);
                                         note.put("level5",0);
+                                        note.put("Coin",20);
 
                                         db.collection("UserProfile").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(note).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override

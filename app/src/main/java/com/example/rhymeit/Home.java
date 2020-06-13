@@ -1,9 +1,11 @@
 package com.example.rhymeit;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -11,27 +13,27 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.nikartm.button.FitButton;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.skydoves.elasticviews.ElasticButton;
 import com.skydoves.elasticviews.ElasticImageView;
 
 import javax.annotation.Nullable;
 
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
+
 public class Home extends AppCompatActivity {
-//pixel perfect
+    private static final String CHANNEL_ID ="exampleChannel" ;
+    //pixel perfect
     //Ilya Pavlov
 //NEW
 //Convert to GIF
@@ -42,18 +44,28 @@ public class Home extends AppCompatActivity {
 //
 //
 //Like
+    //Mr.Futuristic
+    //Tu Nguyen
     FirebaseAuth mFirebaseAuth;
     ElasticImageView share,about,rating;
     FitButton rhymebtn,logout;
-    TextView userid,username,score,progress;
+    TextView userid,username,score,progress,coin;
     MaterialProgressBar mProgressBar;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore db;
     private DocumentReference noteRef;
-    Integer i;
+    boolean isConnected;
+    double i;
+    Long l1;
+    Long l2;
+    Long l3;
+    Long l4;
+    ProgressBar game;
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onStart() {
         super.onStart();
         noteRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @SuppressLint("SetTextI18n")
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -62,24 +74,43 @@ public class Home extends AppCompatActivity {
                     Log.d("Exception", e.toString());
                     return;
                 }
-                assert documentSnapshot != null;
                 if(documentSnapshot.exists()){
                     username.setText(documentSnapshot.getString("Username"));
-                 i =Integer.parseInt(documentSnapshot.get("level1").toString())+Integer.parseInt(documentSnapshot.get("level2").toString())
-                            +Integer.parseInt(documentSnapshot.get("level3").toString())+Integer.parseInt(documentSnapshot.get("level4").toString());
-                 Log.d("Score",i+"");
-                    mProgressBar.setProgress(i/40,true);
-                    Long a = i.longValue()/40;
-                    a = a*100;
-                    progress.setText(a+"%");
-
+                    Long b = documentSnapshot.getLong("Coin");
+                    coin.setText(documentSnapshot.getLong("Coin")+"");
+                    Log.d("Coin",b+"");
+                    i =  calculate(documentSnapshot.getLong("level1"),documentSnapshot.getLong("level2"),documentSnapshot.getLong("level3"),documentSnapshot.getLong("level4"));
+                    updateProgress((long) calculate(documentSnapshot.getLong("level1"),documentSnapshot.getLong("level2"),documentSnapshot.getLong("level3"),documentSnapshot.getLong("level4")));
+                    l1 = documentSnapshot.getLong("level1");
+                    l2 = documentSnapshot.getLong("level2");
+                    l3 = documentSnapshot.getLong("level3");
+                    l4 = documentSnapshot.getLong("level4");
+                    Log.d("Progress3", i+"");
                 }else{
 
                 }
 
             }
         });
+    userid.setOnClickListener(v -> {
+        ClipboardManager manager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData mdata = ClipData.newPlainText("practice",userid.getText());
+        manager.setPrimaryClip(mdata);
+    });
+    }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void updateProgress(Long calculate) {
+        progress.setText(calculate+"%");
+        mProgressBar.setProgress(calculate.intValue(),true);
+        Log.d("Prog",calculate+"");
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private double calculate(Long level1, Long level2, Long level3, Long level4) {
+        Long a = level1+level2+level3+level4;
+        Log.d("Progress4",a+"");
+        return a * 2.5;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -87,6 +118,8 @@ public class Home extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        coin = findViewById(R.id.coinview3);
+        db  = FirebaseFirestore.getInstance();
         getWindow().setStatusBarColor(Color.parseColor("#0F2027"));
         getWindow().setNavigationBarColor(Color.parseColor("#2C5364"));
         rhymebtn = findViewById(R.id.rhymebtn);
@@ -159,7 +192,11 @@ public class Home extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse("market://details?id=" + getPackageName()));
-                startActivity(i);
+                try {
+                    startActivity(i);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

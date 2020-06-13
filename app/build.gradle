@@ -11,17 +11,21 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-
+        vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -52,6 +56,7 @@ dependencies {
     implementation "com.github.skydoves:elasticviews:2.0.7"
     implementation 'me.zhanghai.android.materialprogressbar:library:1.6.1'
     implementation 'br.com.simplepass:loading-button-android:2.2.0'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
+    implementation "com.github.skydoves:balloon:1.1.7"
+    implementation 'com.intuit.sdp:sdp-android:1.0.6'
 
 }

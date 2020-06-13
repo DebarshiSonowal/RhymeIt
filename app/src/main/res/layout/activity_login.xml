@@ -61,8 +61,8 @@
         app:fb_shape="rectangle"
         app:fb_text="Log in"
         app:fb_textColor="#000000"
-        app:fb_textPaddingStart="16dp"
-        app:fb_textSize="24dp"
+        app:fb_textPaddingStart="10dp"
+        app:fb_textSize="@dimen/_20sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.071"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,8 +94,8 @@
         app:fb_shape="rectangle"
         app:fb_text="Sign up"
         app:fb_textColor="#000000"
-        app:fb_textPaddingStart="16dp"
-        app:fb_textSize="24dp"
+        app:fb_textPaddingStart="10dp"
+        app:fb_textSize="@dimen/_20sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline58" />
 
@@ -188,7 +188,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.486"
-                app:passwordToggleEnabled="true" >
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="#000000">
 
                 <EditText
                     android:id="@+id/passwordtext"

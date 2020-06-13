@@ -1,19 +1,27 @@
 package com.example.rhymeit;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
+
+
 public class SplashScreen extends AppCompatActivity {
 TextView tite,tag,from,publisher;
 Animation top,bottom;
+
     int SPLASH_TIME = 4000;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +40,10 @@ Animation top,bottom;
         tag.setAnimation(bottom);
         from.setAnimation(bottom);
         publisher.setAnimation(bottom);
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
                 Intent intent = new Intent(SplashScreen.this,login.class);
                 startActivity(intent);
                 finish();

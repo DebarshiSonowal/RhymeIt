@@ -106,7 +106,7 @@
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/guideline39"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/guideline40"
                 app:mpb_progressStyle="horizontal" />
 
@@ -115,7 +115,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.44" />
+                app:layout_constraintGuide_percent="0.28" />
 
             <ImageView
                 android:id="@+id/imageView"
@@ -136,8 +136,8 @@
 
             <com.github.nikartm.button.FitButton
                 android:id="@+id/logoutbtn"
-                android:layout_width="106dp"
-                android:layout_height="45dp"
+                android:layout_width="100dp"
+                android:layout_height="35dp"
                 android:layout_margin="32dp"
                 android:enabled="true"
                 android:gravity="center_vertical"
@@ -156,8 +156,8 @@
                 app:fb_shape="rectangle"
                 app:fb_text="log out"
                 app:fb_textColor="#FFFFFF"
-                app:fb_textPaddingStart="20dp"
-                app:fb_textSize="24dp"
+                app:fb_textPaddingStart="15dp"
+                app:fb_textSize="@dimen/_17sdp"
                 app:layout_constraintBottom_toTopOf="@+id/guideline42"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/guideline41"
@@ -176,7 +176,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/guideline39"
                 app:layout_constraintTop_toTopOf="@+id/guideline42"
-                app:layout_constraintVertical_bias="0.591" />
+                app:layout_constraintVertical_bias="0.68" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline40"
@@ -198,7 +198,7 @@
                 android:layout_height="25dp"
                 android:gravity="center"
                 android:textColor="#FFFFFF"
-                android:textSize="10sp"
+                android:textSize="@dimen/_8sdp"
                 app:layout_constraintBottom_toTopOf="@+id/guideline42"
                 app:layout_constraintEnd_toStartOf="@+id/guideline41"
                 app:layout_constraintHorizontal_bias="0.468"
@@ -216,8 +216,44 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/guideline40"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.3"
                 app:layout_constraintStart_toStartOf="@+id/guideline41"
+                app:layout_constraintTop_toTopOf="@+id/guideline42"
+                app:layout_constraintVertical_bias="0.863" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="46dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                app:layout_constraintStart_toStartOf="@+id/guideline39"
+                app:layout_constraintTop_toTopOf="@+id/guideline42"
+                app:srcCompat="@drawable/ic_gold" />
+
+            <TextView
+                android:id="@+id/coinview3"
+                android:layout_width="62dp"
+                android:layout_height="23dp"
+                android:layout_marginTop="20dp"
+                android:background="#FFFFFF"
+                android:gravity="center"
+                android:includeFontPadding="true"
+                android:text="0"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/imageView2"
                 app:layout_constraintTop_toTopOf="@+id/guideline42" />
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:layout_constraintStart_toEndOf="@+id/coinview3"
+                app:layout_constraintTop_toTopOf="@+id/guideline42"
+                app:srcCompat="@drawable/ic_baseline_add_24" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -326,4 +362,5 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline48"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline38" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

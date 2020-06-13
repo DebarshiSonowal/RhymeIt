@@ -23,6 +23,8 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -31,6 +33,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class login extends AppCompatActivity {
     private static final int RC_SIGN_IN = 2;
@@ -43,6 +49,8 @@ public class login extends AppCompatActivity {
     FirebaseAuth.AuthStateListener mAuthListener;
     String personName;
     String personEmail;
+    DatabaseReference databaseReference;
+    FirebaseFirestore db ;
 
     @Override
     protected void onStart() {
@@ -62,7 +70,7 @@ public class login extends AppCompatActivity {
         txtPassword = (EditText)findViewById(R.id.passwordtext);
         btn_login =  findViewById(R.id.loginbtn);
         btn_signup = findViewById(R.id.signupbtn);
-
+        db = FirebaseFirestore.getInstance();
         //Instance
         root = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -185,6 +193,32 @@ public class login extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            Map<String, Object> note = new HashMap<>();
+                            note.put("Email",personEmail);
+                            note.put("Username",personName);
+                            note.put("level1",0);
+                            note.put("level2",0);
+                            note.put("level3",0);
+                            note.put("level4",0);
+                            note.put("level5",0);
+                            note.put("Coin",20);
+
+                            db.collection("UserProfile").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(note).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    Toast.makeText(login.this, "Registration Complete", Toast.LENGTH_SHORT).show();
+                                }
+                            }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(login.this,"Successful",Toast.LENGTH_SHORT).show();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(login.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("TAG", "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();

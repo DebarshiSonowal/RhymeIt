@@ -1,5 +1,6 @@
 package com.example.rhymeit;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -19,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -29,7 +31,10 @@ import com.android.volley.toolbox.Volley;
 import com.github.nikartm.button.FitButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
@@ -64,7 +69,7 @@ public class MainActivity2 extends AppCompatActivity {
     Animation blink;
     ImageView first, second, third;
     EditText userinput;
-    TextView scoreview;
+    TextView scoreview,coin;
     Animation.AnimationListener mAnimationListener;
     CircularProgressBar timecircle;
     ListView interactionlist;
@@ -76,11 +81,26 @@ public class MainActivity2 extends AppCompatActivity {
     int i = 0, j = 0,l;
     FitButton sendbtn,hintbtn;
     DocumentReference note;
+    Integer l1,l2,l3,l4;
     public static final String name ="Progress";
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        try {
+            mCountDownTimer.cancel();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+        getWindow().setStatusBarColor(Color.parseColor("#B93963"));
+
         //Firestone
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db = FirebaseFirestore.getInstance();
@@ -104,6 +124,7 @@ public class MainActivity2 extends AppCompatActivity {
         hintbtn = findViewById(R.id.fbtn2);
         mAdapter = new Adapter(this, messages, direction);
         interactionlist.setAdapter(mAdapter);
+        coin = findViewById(R.id.coincount);
         mProgressBar.setMax(10);
         timecircle.setProgressMax(START_TIME_IN_MILLIS);
         scoreview = findViewById(R.id.scoreview2);
@@ -131,8 +152,27 @@ public class MainActivity2 extends AppCompatActivity {
         first.startAnimation(blink);
         second.startAnimation(blink);
         third.startAnimation(blink);
+        suitableInput(getLevelno());
         Random random = new Random();
         getinput(random.nextInt(4));
+
+        note.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Toast.makeText(MainActivity2.this, "Error while loading!", Toast.LENGTH_SHORT).show();
+                    Log.d("Exception", e.toString());
+                    return;
+                }
+                if(documentSnapshot.exists()){
+                    coin.setText(documentSnapshot.get("Coin").toString());
+                    l1 = Integer.parseInt(documentSnapshot.get("level1").toString());
+                    l2 = Integer.parseInt(documentSnapshot.get("level2").toString());
+                    l3 = Integer.parseInt(documentSnapshot.get("level3").toString());
+                    l4 = Integer.parseInt(documentSnapshot.get("level4").toString());
+                }
+            }
+        });
 
         hintbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,7 +180,7 @@ public class MainActivity2 extends AppCompatActivity {
                 help(used.get(used.size()-1));
             }
         });
-
+        sendbtn.setEnabled(true);
         sendbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -152,7 +192,8 @@ public class MainActivity2 extends AppCompatActivity {
                                 DictionaryRequest myDictionaryRequest = new DictionaryRequest(MainActivity2.this);
                                 Log.d("Async","1Inside");
                                 myDictionaryRequest.execute(url);
-
+                                sendbtn.setEnabled(false);
+                                hintbtn.setEnabled(false);
                             } else {
                                 FancyToast.makeText(MainActivity2.this, "It does not rhyme with other word", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
                                 reduceLives();
@@ -174,6 +215,35 @@ public class MainActivity2 extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void suitableInput(int levelno) {
+        switch (levelno){
+            case 2:
+                messages.add("Welcome to RhymeIt level 2. Minimum word length is 2");
+                direction.add(false);
+                used.add("Welcome to RhymeIt level 2. Minimum word length is 2");
+                mAdapter.notifyDataSetChanged();
+                break;
+            case 3:
+                messages.add("Welcome to RhymeIt level 3. Minimum word length is 3");
+                direction.add(false);
+                used.add("Welcome to RhymeIt level 3. Minimum word length is 3");
+                mAdapter.notifyDataSetChanged();
+                break;
+            case 4:
+                messages.add("Welcome to RhymeIt level 4. Minimum word length is 4");
+                direction.add(false);
+                used.add("Welcome to RhymeIt level 4. Minimum word length is 4");
+                mAdapter.notifyDataSetChanged();
+                break;
+            default:
+                messages.add("Welcome to RhymeIt level 1.No minimum length");
+                direction.add(false);
+                used.add("Welcome to RhymeIt level 1.No minimum length");
+                mAdapter.notifyDataSetChanged();
+                break;
+        }
     }
 
     private void help(String s) {
@@ -206,11 +276,17 @@ public class MainActivity2 extends AppCompatActivity {
                                         Map<String, Object> score = new HashMap<>();
                                         score.put("level"+getLevelno(),l);
                                         //                                    db.collection("Score").document("level"+l).set(score);
-                                        note.set(score);
+                                        if (getlevelprogress() < l) {
+                                            note.update(score);
+                                        }
                                         SharedPreferences sharedPreferences = getSharedPreferences("Progress",MODE_PRIVATE);
                                         SharedPreferences.Editor editor = sharedPreferences.edit();
                                         editor.putInt("score",l);
+                                        editor.apply();
+                                        editor.putInt("level",getLevelno());
+                                        editor.commit();
                                         Successful_dialog dialog = new Successful_dialog();
+                                        dialog.setCancelable(false);
                                         dialog.show(getSupportFragmentManager(), "Successful");
 
                                     }
@@ -232,6 +308,7 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     private void getinput(int nextInt) {
+        userinput.setTextSize(24);
         String string = keywords.get(nextInt);
         URL2 = URl1 + "ml=" + string.toLowerCase() + "&sp=b*";
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, URL2, null,
@@ -316,14 +393,33 @@ public class MainActivity2 extends AppCompatActivity {
                     Map<String, Object> score = new HashMap<>();
                     score.put("level"+getLevelno(),l);
 //                                    db.collection("Score").document("level"+l).set(score);
-                    note.update(score);
+                    if (getlevelprogress() < l) {
+                        note.update(score);
+                    }
                     SharedPreferences sharedPreferences = getSharedPreferences("Progress",MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putInt("score",l);
+                    editor.apply();
+                    editor.putInt("level",getLevelno());
+                    editor.commit();
                     FailedDialog dialog = new FailedDialog();
+                    dialog.setCancelable(false);
                     dialog.show(getSupportFragmentManager(),"Failed");
                 }
             }
+        }
+    }
+
+    private int getlevelprogress() {
+        switch (getLevelno()){
+            case 2:
+                return l2;
+            case 3:
+                return l3;
+            case 4:
+                return l4;
+            default:
+                return l1;
         }
     }
 
@@ -347,11 +443,17 @@ public class MainActivity2 extends AppCompatActivity {
                     Map<String, Object> score = new HashMap<>();
                     score.put("level"+getLevelno(),l);
 //                                    db.collection("Score").document("level"+l).set(score);
-                    note.update(score);
+                    if (getlevelprogress() < l) {
+                        note.update(score);
+                    }
                     SharedPreferences sharedPreferences = getSharedPreferences("Progress",MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putInt("score",l);
+                    editor.apply();
+                    editor.putInt("level",getLevelno());
+                    editor.commit();
                     FailedDialog dialog = new FailedDialog();
+                    dialog.setCancelable(false);
                     dialog.show(getSupportFragmentManager(),"Failed");
                 }
             }
@@ -495,7 +597,7 @@ public class MainActivity2 extends AppCompatActivity {
                 e.printStackTrace();
 
             }
-            if (!result.equals("null")) {
+            if (result != null) {
                 try {
                     Log.d("sd",result);
                     JSONObject jsonObject = new JSONObject(result);
@@ -593,16 +695,24 @@ public class MainActivity2 extends AppCompatActivity {
                     Map<String, Object> score = new HashMap<>();
                     score.put("level"+getLevelno(),l);
     //                                    db.collection("Score").document("level"+l).set(score);
-                    note.set(score);
+                    if (getlevelprogress() < l) {
+                        note.update(score);
+                    }
                     SharedPreferences sharedPreferences = getSharedPreferences("Progress",MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putInt("score",l);
+                    editor.apply();
+                    editor.putInt("level",getLevelno());
+                    editor.commit();
                     Successful_dialog dialog = new Successful_dialog();
+                    dialog.setCancelable(false);
                     dialog.show(getSupportFragmentManager(), "Successful");
 
                 }
                 else {
                     sendTheMessage(s);
+                    sendbtn.setEnabled(true);
+                    hintbtn.setEnabled(true);
                 }
             }
             userinput.setText("");

@@ -41,6 +41,13 @@ DocumentReference note;
 String uid;
 FirebaseFirestore db;
 Balloon ballon,ballon2,ballon3,ballon4;
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(GameOptions.this,Home.class));
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -67,31 +74,29 @@ Balloon ballon,ballon2,ballon3,ballon4;
             }
         });
         //level1
-        ballon = new Balloon.Builder(GameOptions.this)
-                .setArrowSize(10)
-                .setArrowOrientation(ArrowOrientation.TOP)
-                .setArrowVisible(true)
-                .setWidthRatio(1.0f)
-                .setHeight(65)
-                .setTextSize(15f)
-                .setArrowPosition(0.62f)
-                .setCornerRadius(4f)
-                .setAlpha(0.9f)
-                .setText("This is the first level. No requirement")
-                .setTextColor(Color.parseColor("#FFFFFF"))
-                .setIconDrawable(ContextCompat.getDrawable(GameOptions.this, R.drawable.ic_info))
-                .setBackgroundColor(Color.parseColor("#6A38A7"))
-                .setBalloonAnimation(BalloonAnimation.FADE)
-                .build();
-        ballon.setOnBalloonClickListener(new OnBalloonClickListener() {
-            @Override
-            public void onBalloonClick(@NotNull View view) {
-                ballon.dismiss();
-                Intent intent = new Intent(GameOptions.this,MainActivity2.class);
-                intent.putExtra("level",1);
-                startActivity(intent);
-            }
-        });
+//        ballon = new Balloon.Builder(GameOptions.this)
+//                .setArrowSize(10)
+//                .setArrowOrientation(ArrowOrientation.TOP)
+//                .setArrowVisible(true)
+//                .setWidthRatio(1.0f)
+//                .setHeight(65)
+//                .setTextSize(15f)
+//                .setArrowPosition(0.62f)
+//                .setCornerRadius(4f)
+//                .setAlpha(0.9f)
+//                .setText("This is the first level. No requirement")
+//                .setTextColor(Color.parseColor("#FFFFFF"))
+//                .setIconDrawable(ContextCompat.getDrawable(GameOptions.this, R.drawable.ic_info))
+//                .setBackgroundColor(Color.parseColor("#6A38A7"))
+//                .setBalloonAnimation(BalloonAnimation.FADE)
+//                .build();
+//        ballon.setOnBalloonClickListener(new OnBalloonClickListener() {
+//            @Override
+//            public void onBalloonClick(@NotNull View view) {
+//                ballon.dismiss();
+//
+//            }
+//        });
 //        ballon.setOnBalloonDismissListener(new OnBalloonDismissListener() {
 //            @Override
 //            public void onBalloonDismiss() {
@@ -101,31 +106,29 @@ Balloon ballon,ballon2,ballon3,ballon4;
 //            }
 //        });
 
-        ballon2  = new Balloon.Builder(GameOptions.this)
-                .setArrowSize(10)
-                .setArrowOrientation(ArrowOrientation.TOP)
-                .setArrowVisible(true)
-                .setWidthRatio(1.0f)
-                .setHeight(65)
-                .setTextSize(15f)
-                .setArrowPosition(0.62f)
-                .setCornerRadius(4f)
-                .setAlpha(0.9f)
-                .setText("This is the second level. Minimum word length is 2")
-                .setTextColor(Color.parseColor("#FFFFFF"))
-                .setIconDrawable(ContextCompat.getDrawable(GameOptions.this, R.drawable.ic_info))
-                .setBackgroundColor(Color.parseColor("#A7383D"))
-                .setBalloonAnimation(BalloonAnimation.FADE)
-                .build();
-        ballon2.setOnBalloonClickListener(new OnBalloonClickListener() {
-            @Override
-            public void onBalloonClick(@NotNull View view) {
-                ballon2.dismiss();
-                Intent intent = new Intent(GameOptions.this,MainActivity2.class);
-                intent.putExtra("level",2);
-                startActivity(intent);
-            }
-        });
+//        ballon2  = new Balloon.Builder(GameOptions.this)
+//                .setArrowSize(10)
+//                .setArrowOrientation(ArrowOrientation.TOP)
+//                .setArrowVisible(true)
+//                .setWidthRatio(1.0f)
+//                .setHeight(65)
+//                .setTextSize(15f)
+//                .setArrowPosition(0.62f)
+//                .setCornerRadius(4f)
+//                .setAlpha(0.9f)
+//                .setText("This is the second level. Minimum word length is 2")
+//                .setTextColor(Color.parseColor("#FFFFFF"))
+//                .setIconDrawable(ContextCompat.getDrawable(GameOptions.this, R.drawable.ic_info))
+//                .setBackgroundColor(Color.parseColor("#A7383D"))
+//                .setBalloonAnimation(BalloonAnimation.FADE)
+//                .build();
+//        ballon2.setOnBalloonClickListener(new OnBalloonClickListener() {
+//            @Override
+//            public void onBalloonClick(@NotNull View view) {
+//                ballon2.dismiss();
+//
+//            }
+//        });
 //        ballon2.setOnBalloonDismissListener(new OnBalloonDismissListener() {
 //            @Override
 //            public void onBalloonDismiss() {
@@ -134,57 +137,52 @@ Balloon ballon,ballon2,ballon3,ballon4;
 //                startActivity(intent);
 //            }
 //        });
-
-        ballon3  = new Balloon.Builder(GameOptions.this)
-                .setArrowSize(10)
-                .setArrowOrientation(ArrowOrientation.TOP)
-                .setArrowVisible(true)
-                .setWidthRatio(1.0f)
-                .setHeight(65)
-                .setTextSize(15f)
-                .setArrowPosition(0.62f)
-                .setCornerRadius(4f)
-                .setAlpha(0.9f)
-                .setText("This is the third level. Minimum word length is 3")
-                .setTextColor(Color.parseColor("#FFFFFF"))
-                .setIconDrawable(ContextCompat.getDrawable(GameOptions.this, R.drawable.ic_info))
-                .setBackgroundColor(Color.parseColor("#74A738"))
-                .setBalloonAnimation(BalloonAnimation.FADE)
-                .build();
-        ballon3.setOnBalloonClickListener(new OnBalloonClickListener() {
-            @Override
-            public void onBalloonClick(@NotNull View view) {
-                ballon3.dismiss();
-                Intent intent = new Intent(GameOptions.this,MainActivity2.class);
-                intent.putExtra("level",3);
-                startActivity(intent);
-            }
-        });
-        ballon4  = new Balloon.Builder(GameOptions.this)
-                .setArrowSize(10)
-                .setArrowOrientation(ArrowOrientation.TOP)
-                .setArrowVisible(true)
-                .setWidthRatio(1.0f)
-                .setHeight(65)
-                .setTextSize(15f)
-                .setArrowPosition(0.62f)
-                .setCornerRadius(4f)
-                .setAlpha(0.9f)
-                .setText("This is the forth level. Minimum word length is 4")
-                .setTextColor(Color.parseColor("#FFFFFF"))
-                .setIconDrawable(ContextCompat.getDrawable(GameOptions.this, R.drawable.ic_info))
-                .setBackgroundColor(Color.parseColor("#38A7A2"))
-                .setBalloonAnimation(BalloonAnimation.FADE)
-                .build();
-        ballon4.setOnBalloonClickListener(new OnBalloonClickListener() {
-            @Override
-            public void onBalloonClick(@NotNull View view) {
-                ballon4.dismiss();
-                Intent intent = new Intent(GameOptions.this,MainActivity2.class);
-                intent.putExtra("level",4);
-                startActivity(intent);
-            }
-        });
+//        ballon3  = new Balloon.Builder(GameOptions.this)
+//                .setArrowSize(10)
+//                .setArrowOrientation(ArrowOrientation.TOP)
+//                .setArrowVisible(true)
+//                .setWidthRatio(1.0f)
+//                .setHeight(65)
+//                .setTextSize(15f)
+//                .setArrowPosition(0.62f)
+//                .setCornerRadius(4f)
+//                .setAlpha(0.9f)
+//                .setText("This is the third level. Minimum word length is 3")
+//                .setTextColor(Color.parseColor("#FFFFFF"))
+//                .setIconDrawable(ContextCompat.getDrawable(GameOptions.this, R.drawable.ic_info))
+//                .setBackgroundColor(Color.parseColor("#74A738"))
+//                .setBalloonAnimation(BalloonAnimation.FADE)
+//                .build();
+//        ballon3.setOnBalloonClickListener(new OnBalloonClickListener() {
+//            @Override
+//            public void onBalloonClick(@NotNull View view) {
+//                ballon3.dismiss();
+//
+//            }
+//        });
+//        ballon4 = new Balloon.Builder(GameOptions.this)
+//                .setArrowSize(10)
+//                .setArrowOrientation(ArrowOrientation.TOP)
+//                .setArrowVisible(true)
+//                .setWidthRatio(1.0f)
+//                .setHeight(65)
+//                .setTextSize(15f)
+//                .setArrowPosition(0.62f)
+//                .setCornerRadius(4f)
+//                .setAlpha(0.9f)
+//                .setText("This is the forth level. Minimum word length is 4")
+//                .setTextColor(Color.parseColor("#FFFFFF"))
+//                .setIconDrawable(ContextCompat.getDrawable(GameOptions.this, R.drawable.ic_info))
+//                .setBackgroundColor(Color.parseColor("#38A7A2"))
+//                .setBalloonAnimation(BalloonAnimation.FADE)
+//                .build();
+//        ballon4.setOnBalloonClickListener(new OnBalloonClickListener() {
+//            @Override
+//            public void onBalloonClick(@NotNull View view) {
+//                ballon4.dismiss();
+//
+//            }
+//        });
         //level2
 
 //        SharedPreferences sharedPreferences = getSharedPreferences("progress",MODE_PRIVATE);
@@ -238,25 +236,33 @@ Balloon ballon,ballon2,ballon3,ballon4;
         level1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ballon.show(level1,0,0);
+                Intent intent = new Intent(GameOptions.this,MainActivity2.class);
+                intent.putExtra("level",1);
+                startActivity(intent);
             }
         });
         level2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             ballon2.show(level2,0,0);
+                Intent intent = new Intent(GameOptions.this,MainActivity2.class);
+                intent.putExtra("level",2);
+                startActivity(intent);
             }
         });
         level3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               ballon3.show(level3,0,0);
+                Intent intent = new Intent(GameOptions.this,MainActivity2.class);
+                intent.putExtra("level",3);
+                startActivity(intent);
             }
         });
         level4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               ballon4.show(level4,0,0);
+                Intent intent = new Intent(GameOptions.this,MainActivity2.class);
+                intent.putExtra("level",4);
+                startActivity(intent);
             }
         });
 

@@ -62,7 +62,7 @@
         app:fb_text="Log in"
         app:fb_textColor="#000000"
         app:fb_textPaddingStart="10dp"
-        app:fb_textSize="@dimen/_20sdp"
+        app:fb_textSize="@dimen/_17sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.071"
         app:layout_constraintStart_toStartOf="parent"
@@ -95,7 +95,7 @@
         app:fb_text="Sign up"
         app:fb_textColor="#000000"
         app:fb_textPaddingStart="10dp"
-        app:fb_textSize="@dimen/_20sdp"
+        app:fb_textSize="@dimen/_17sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline58" />
 

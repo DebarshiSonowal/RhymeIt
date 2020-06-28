@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -28,8 +29,9 @@ import java.util.Map;
 
 public class ScoreShowing extends AppCompatActivity {
 CircleProgressBar mCircleProgressBar;
-ElasticButton playagain;
-TextView score,target;
+ElasticButton playagain,next;
+TextView score;
+TextView whatsappview,facebookview;
 ImageView whatsapp,facebook;
 FirebaseFirestore db;
 DocumentReference note;
@@ -51,7 +53,7 @@ Long money;
         note = db.document("UserProfile/"+FirebaseAuth.getInstance().getCurrentUser().getUid());
         getWindow().setStatusBarColor(Color.parseColor("#383C46"));
         getWindow().setNavigationBarColor(Color.parseColor("#5784CF"));
-
+        whatsappview = findViewById(R.id.whatsappshareview);
         SharedPreferences preferences = getSharedPreferences(name, MODE_PRIVATE);
         if (preferences != null) {
             i = preferences.getInt("score",0);
@@ -70,7 +72,8 @@ Long money;
         playagain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ScoreShowing.this,GameOptions.class);
+                Intent intent = new Intent(ScoreShowing.this,MainActivity2.class);
+                intent.putExtra("level",l);
                 startActivity(intent);
             }
         });
@@ -88,27 +91,47 @@ Long money;
 
             }
         });
-
+whatsappview.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.setPackage("com.whatsapp");
+        intent.putExtra(Intent.EXTRA_TEXT,"Hey look my new high score: "+i+". Can you beat my score ? \n"+"http://play.google.com/store/apps/details?id=" + getPackageName());
+        startActivity(intent);
+    }
+});
         //facebook
-        facebook = findViewById(R.id.facebookshare);
-        facebook.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT,"Hey look my new high score: "+i+" on level "+l+". Can you beat my score ? \n"+"http://play.google.com/store/apps/details?id=" + getPackageName());
-                startActivity(intent.createChooser(intent,"Share it"));
-            }
-        });
+//        facebook = findViewById(R.id.facebookshare);
+//        facebook.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(Intent.ACTION_SEND);
+//                intent.setType("text/plain");
+//                intent.putExtra(Intent.EXTRA_TEXT,"Hey look my new high score: "+i+" on level "+l+". Can you beat my score ? \n"+"http://play.google.com/store/apps/details?id=" + getPackageName());
+//                startActivity(intent.createChooser(intent,"Share it"));
+//            }
+//        });
 
         score = findViewById(R.id.score);
         score.setText(i+"");
+
+        next = findViewById(R.id.next);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ScoreShowing.this,GameOptions.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.winsound);
+        mediaPlayer.start();
         note.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {

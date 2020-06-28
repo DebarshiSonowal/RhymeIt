@@ -27,7 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
+
 
 public class signup extends AppCompatActivity {
     EditText  txtUserName,txtEmail, txtPassword, txtConfirmPassword;

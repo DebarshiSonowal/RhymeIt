@@ -3,18 +3,23 @@ package com.example.rhymeit;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Looper;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -60,10 +65,11 @@ public class MainActivity2 extends AppCompatActivity {
     final String URl1 = "https://api.datamuse.com/words?";
     final String URl = "https://api.datamuse.com/words?sp=";
     private static final long START_TIME_IN_MILLIS = 30000;
+    private static final long RESPONSE = 3000;
     FirebaseFirestore db;
     private static long TIMER;
-    private CountDownTimer mCountDownTimer;
-    String URL3, URL2, url,uid,finaltext,asd;
+    private CountDownTimer mCountDownTimer,responseTime;
+    String URL3, URL2, url,uid,finaltext;
     private RequestQueue mRequestQueue;
     ProgressBar mProgressBar;
     Animation blink;
@@ -77,11 +83,14 @@ public class MainActivity2 extends AppCompatActivity {
     List<String> messages = new ArrayList<>();
     List<Boolean> direction = new ArrayList<>();
     List<String> keywords;
-    Adapter mAdapter;
+    Adapter2 mAdapter;
     int i = 0, j = 0,l;
     FitButton sendbtn,hintbtn;
     DocumentReference note;
-    Integer l1,l2,l3,l4;
+    Integer l1,l2,l3,l4,money,charge;
+    DictionaryRequest myDictionaryRequest;
+    NetworkTask mTask;
+    JsonArrayRequest request;
     public static final String name ="Progress";
 
     @Override
@@ -99,7 +108,7 @@ public class MainActivity2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-        getWindow().setStatusBarColor(Color.parseColor("#B93963"));
+        getWindow().setStatusBarColor(Color.parseColor("#1D2671"));
 
         //Firestone
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -118,11 +127,12 @@ public class MainActivity2 extends AppCompatActivity {
         mProgressBar = findViewById(R.id.progressBar);
         sendbtn = findViewById(R.id.fbtn);
         userinput = findViewById(R.id.userbox2);
+//        userinput.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         timecircle = findViewById(R.id.circularProgressBar);
         interactionlist = findViewById(R.id.listview);
         mRequestQueue = Volley.newRequestQueue(this);
         hintbtn = findViewById(R.id.fbtn2);
-        mAdapter = new Adapter(this, messages, direction);
+        mAdapter = new Adapter2(this, messages, direction);
         interactionlist.setAdapter(mAdapter);
         coin = findViewById(R.id.coincount);
         mProgressBar.setMax(10);
@@ -133,7 +143,7 @@ public class MainActivity2 extends AppCompatActivity {
         first = findViewById(R.id.firstlive);
         second = findViewById(R.id.secondlive);
         third = findViewById(R.id.thirdlive);
-
+        charge = getHintCharge(getLevelno());
 
 
 
@@ -149,6 +159,8 @@ public class MainActivity2 extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        sendbtn.setEnabled(false);
+        hintbtn.setEnabled(false);
         first.startAnimation(blink);
         second.startAnimation(blink);
         third.startAnimation(blink);
@@ -165,6 +177,7 @@ public class MainActivity2 extends AppCompatActivity {
                     return;
                 }
                 if(documentSnapshot.exists()){
+                    money = documentSnapshot.getLong("Coin").intValue();
                     coin.setText(documentSnapshot.get("Coin").toString());
                     l1 = Integer.parseInt(documentSnapshot.get("level1").toString());
                     l2 = Integer.parseInt(documentSnapshot.get("level2").toString());
@@ -177,70 +190,141 @@ public class MainActivity2 extends AppCompatActivity {
         hintbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                help(used.get(used.size()-1));
+                if (money >= getHintCharge(getLevelno())) {
+                    money = money- charge;
+                    help(used.get(used.size()-1));
+                    Map<String, Object> val = new HashMap<>();
+                    val.put("Coin",money);
+                    note.update(val);
+                }else{
+                    Notsuffiecient dialog = new Notsuffiecient();
+                    dialog.show(getSupportFragmentManager(), "Notsufficient");
+                }
             }
         });
         sendbtn.setEnabled(true);
         sendbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                finaltext = userinput.getText().toString().toLowerCase();
+                sendbtn.setEnabled(false);
+                hintbtn.setEnabled(false);
                 if(!TextUtils.isEmpty(userinput.getText().toString().toLowerCase())){
-                    if (!checkIfUsed(userinput.getText().toString().toLowerCase())) {
-                        if (getNoChar(getLevelno()) <= userinput.getText().toString().trim().length()) {
-                            if (checkRhyme(userinput.getText().toString().toLowerCase())) {
-                                url = dictionaryURl(userinput.getText().toString().toLowerCase());
-                                DictionaryRequest myDictionaryRequest = new DictionaryRequest(MainActivity2.this);
+                    if (!checkIfUsed(finaltext)) {
+                        if (getNoChar(getLevelno()) <= finaltext.length()) {
+                            if (checkRhyme(finaltext)) {
+                                url = dictionaryURl(finaltext);
+                                startWaiting();
+                                myDictionaryRequest = new DictionaryRequest(MainActivity2.this);
                                 Log.d("Async","1Inside");
                                 myDictionaryRequest.execute(url);
-                                sendbtn.setEnabled(false);
-                                hintbtn.setEnabled(false);
+
                             } else {
                                 FancyToast.makeText(MainActivity2.this, "It does not rhyme with other word", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
                                 reduceLives();
                                 userinput.setText("");
+                                sendbtn.setEnabled(true);
+                                hintbtn.setEnabled(true);
                             }
                         } else {
                             FancyToast.makeText(MainActivity2.this, "The minimum character criteria is " + getNoChar(getLevelno()), FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
                             reduceLives();
                             userinput.setText("");
+                            sendbtn.setEnabled(true);
+                            hintbtn.setEnabled(true);
                         }
                     } else {
                         FancyToast.makeText(MainActivity2.this, "You have used it", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
                         reduceLives();
                         userinput.setText("");
+                        sendbtn.setEnabled(true);
+                        hintbtn.setEnabled(true);
                     }
                 }else{
                     FancyToast.makeText(MainActivity2.this,"Can't send empty",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
                     userinput.setText("");
+                    sendbtn.setEnabled(true);
+                    hintbtn.setEnabled(true);
                 }
             }
         });
     }
 
+    private void startWaiting() {
+        responseTime = new CountDownTimer(RESPONSE,1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                if(j<2){
+                    Log.d("Time","finished");
+                    FancyToast.makeText(MainActivity2.this,"Internet Connection is slow.Retrying please wait",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+                    myDictionaryRequest.cancel(true);
+                    try {
+                        mTask.cancel(true);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    j++;
+                    myDictionaryRequest = new DictionaryRequest(MainActivity2.this);
+                    Log.d("Async","1Inside");
+                    myDictionaryRequest.execute(url);
+                    startWaiting();
+                }else{
+                    mCountDownTimer.cancel();
+                    responseTime.cancel();
+                    FancyToast.makeText(MainActivity2.this,"Internet Connection is slow. Connect to a WIFI",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+                    startActivity(new Intent(MainActivity2.this,Home.class));
+
+
+                }
+
+            }
+        };
+        responseTime.start();
+    }
+
+    private Integer getHintCharge(int levelno) {
+        switch (levelno){
+            case 2:
+                return 30;
+            case 3:
+                return 40;
+            case 4:
+                return 50;
+            default:
+                return 10;
+
+        }
+    }
+
     private void suitableInput(int levelno) {
         switch (levelno){
             case 2:
-                messages.add("Welcome to RhymeIt level 2. Minimum word length is 2");
+                messages.add("Welcome to RhymeIt level 2.\n Minimum word length is 2");
                 direction.add(false);
-                used.add("Welcome to RhymeIt level 2. Minimum word length is 2");
+                used.add("Welcome to RhymeIt level 2.\n Minimum word length is 2");
                 mAdapter.notifyDataSetChanged();
                 break;
             case 3:
-                messages.add("Welcome to RhymeIt level 3. Minimum word length is 3");
+                messages.add("Welcome to RhymeIt level 3.\n Minimum word length is 3");
                 direction.add(false);
-                used.add("Welcome to RhymeIt level 3. Minimum word length is 3");
+                used.add("Welcome to RhymeIt level 3.\n Minimum word length is 3");
                 mAdapter.notifyDataSetChanged();
                 break;
             case 4:
-                messages.add("Welcome to RhymeIt level 4. Minimum word length is 4");
+                messages.add("Welcome to RhymeIt level 4.\n Minimum word length is 4");
                 direction.add(false);
-                used.add("Welcome to RhymeIt level 4. Minimum word length is 4");
+                used.add("Welcome to RhymeIt level 4.\n Minimum word length is 4");
                 mAdapter.notifyDataSetChanged();
                 break;
             default:
-                messages.add("Welcome to RhymeIt level 1.No minimum length");
+                messages.add("Welcome to RhymeIt level 1.\n No minimum length");
                 direction.add(false);
-                used.add("Welcome to RhymeIt level 1.No minimum length");
+                used.add("Welcome to RhymeIt level 1.\n No minimum length");
                 mAdapter.notifyDataSetChanged();
                 break;
         }
@@ -272,6 +356,9 @@ public class MainActivity2 extends AppCompatActivity {
                                     i=i+1;
                                     mProgressBar.setProgress(i);
                                     if (mProgressBar.getProgress() == 10) {
+                                        InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                                        imm.hideSoftInputFromWindow(MainActivity2.this.getCurrentFocus().getWindowToken(), 0);
+                                        responseTime.cancel();
                                         mCountDownTimer.cancel();
                                         Map<String, Object> score = new HashMap<>();
                                         score.put("level"+getLevelno(),l);
@@ -308,10 +395,12 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     private void getinput(int nextInt) {
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.anime_cute_text);
+        mediaPlayer.start();
         userinput.setTextSize(24);
         String string = keywords.get(nextInt);
         URL2 = URl1 + "ml=" + string.toLowerCase() + "&sp=b*";
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, URL2, null,
+     request = new JsonArrayRequest(Request.Method.GET, URL2, null,
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
@@ -345,6 +434,9 @@ public class MainActivity2 extends AppCompatActivity {
         direction.add(false);
         used.add(word);
         mAdapter.notifyDataSetChanged();
+        userinput.setHint("Start the word with "+word.charAt(word.length()-1));
+        sendbtn.setEnabled(true);
+        hintbtn.setEnabled(true);
     }
 
     //Starts time
@@ -378,24 +470,35 @@ public class MainActivity2 extends AppCompatActivity {
             first.setVisibility(View.INVISIBLE);
             first.clearAnimation();
             FancyToast.makeText(MainActivity2.this,"You have lost first life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.gunshot);
+            mediaPlayer.start();
         }else{
             if (second.getVisibility() == View.VISIBLE){
                 second.setVisibility(View.INVISIBLE);
                 second.clearAnimation();
                 FancyToast.makeText(MainActivity2.this,"You have lost second life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+                MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.gunshot);
+                mediaPlayer.start();
             }else {
                 if(third.getVisibility() == View.VISIBLE){
                     third.setVisibility(View.INVISIBLE);
                     third.clearAnimation();
                     FancyToast.makeText(MainActivity2.this,"You have lost third life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
+                    MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.gunshot);
+                    mediaPlayer.start();
                 }else{
+                    MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.gunshot);
+                    mediaPlayer.start();
                     mCountDownTimer.cancel();
+                    responseTime.cancel();
                     Map<String, Object> score = new HashMap<>();
                     score.put("level"+getLevelno(),l);
 //                                    db.collection("Score").document("level"+l).set(score);
                     if (getlevelprogress() < l) {
                         note.update(score);
                     }
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(MainActivity2.this.getCurrentFocus().getWindowToken(), 0);
                     SharedPreferences sharedPreferences = getSharedPreferences("Progress",MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putInt("score",l);
@@ -427,19 +530,34 @@ public class MainActivity2 extends AppCompatActivity {
         if (first.getVisibility() == View.VISIBLE) {
             first.setVisibility(View.INVISIBLE);
             first.clearAnimation();
+            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.gunshot);
+            mediaPlayer.start();
 //            FancyToast.makeText(RhymingGame.this,"You have lost first life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
         }else{
             if (second.getVisibility() == View.VISIBLE){
                 second.setVisibility(View.INVISIBLE);
                 second.clearAnimation();
+                MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.gunshot);
+                mediaPlayer.start();
 //                FancyToast.makeText(RhymingGame.this,"You have lost second life",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
             }else {
                 if(third.getVisibility() == View.VISIBLE){
                     third.setVisibility(View.INVISIBLE);
                     third.clearAnimation();
+                    MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.gunshot);
+                    mediaPlayer.start();
 //
                 }else{
+                    MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.gunshot);
+                    mediaPlayer.start();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(MainActivity2.this.getCurrentFocus().getWindowToken(), 0);
                     mCountDownTimer.cancel();
+                    try {
+                        responseTime.cancel();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     Map<String, Object> score = new HashMap<>();
                     score.put("level"+getLevelno(),l);
 //                                    db.collection("Score").document("level"+l).set(score);
@@ -470,6 +588,8 @@ public class MainActivity2 extends AppCompatActivity {
         direction.add(true);
         used.add(toString);
         mAdapter.notifyDataSetChanged();
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.anime_cute_text);
+        mediaPlayer.start();
         getReply(toString);
     }
 
@@ -491,11 +611,15 @@ public class MainActivity2 extends AppCompatActivity {
                             for (int i=0;i<jsonArray.length();i++) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 if(!checkIfUsed(jsonObject.getString("word"))){
+                                    String a = jsonObject.getString("word").charAt(jsonObject.getString("word").length()-1)+"";
                                     Log.d("Reply",jsonObject.getString("word"));
                                     messages.add(jsonObject.getString("word"));
                                     direction.add(false);
                                     used.add(jsonObject.getString("word"));
                                     mAdapter.notifyDataSetChanged();
+                                    userinput.setHint("Start the word with "+a);
+                                    MediaPlayer mediaPlayer = MediaPlayer.create(MainActivity2.this, R.raw.anime_cute_text);
+                                    mediaPlayer.start();
                                     startTimer();
                                     break;
                                 }
@@ -552,8 +676,8 @@ public class MainActivity2 extends AppCompatActivity {
 
     //Check if the word is meaningful
     class DictionaryRequest extends AsyncTask<String,Integer,String>{
-        final String app_id = "5ff4f478";
-        final String api_key="44df5f35344c630ae4ebcf6b0de4052d";
+        final String app_id = "81891c3f";
+        final String api_key="a54a5e951ed581d121a91e9843dc6f9f";
         String url1,result;
         Context mContext;
         String def,sd;
@@ -629,10 +753,10 @@ public class MainActivity2 extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            NetworkTask mTask = new NetworkTask(MainActivity2.this,s);
+            mTask = new NetworkTask(MainActivity2.this,s);
             Log.d("Async","2Inside");
 
-            mTask.execute(userinput.getText().toString().toLowerCase());
+            mTask.execute(finaltext);
 
     }
     }
@@ -671,6 +795,7 @@ public class MainActivity2 extends AppCompatActivity {
                             public void run() {
                                 FancyToast.makeText(MainActivity2.this, "This is not a meaningful word", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
                                 reduceLives();
+                                responseTime.cancel();
                                 verified = null;
                             }
                         });
@@ -691,6 +816,9 @@ public class MainActivity2 extends AppCompatActivity {
                 l = l + 1;
                 scoreview.setText("Score: " + l + "/" + "10");
                 if (mProgressBar.getProgress() == 10) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(MainActivity2.this.getCurrentFocus().getWindowToken(), 0);
+                    responseTime.cancel();
                     mCountDownTimer.cancel();
                     Map<String, Object> score = new HashMap<>();
                     score.put("level"+getLevelno(),l);
@@ -711,12 +839,18 @@ public class MainActivity2 extends AppCompatActivity {
                 }
                 else {
                     sendTheMessage(s);
+                    try {
+                        responseTime.cancel();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     sendbtn.setEnabled(true);
                     hintbtn.setEnabled(true);
                 }
             }
             userinput.setText("");
-
+            sendbtn.setEnabled(true);
+            hintbtn.setEnabled(true);
         }
     }
 }

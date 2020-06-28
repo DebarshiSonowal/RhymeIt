@@ -87,9 +87,7 @@ public class Home extends AppCompatActivity {
                     l4 = documentSnapshot.getLong("level4");
                     Log.d("Progress3", i+"");
                 }else{
-
                 }
-
             }
         });
     userid.setOnClickListener(v -> {
@@ -111,6 +109,13 @@ public class Home extends AppCompatActivity {
         Long a = level1+level2+level3+level4;
         Log.d("Progress4",a+"");
         return a * 2.5;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finishAffinity();
+        System.exit(0);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

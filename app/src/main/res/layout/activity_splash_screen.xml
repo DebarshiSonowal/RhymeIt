@@ -31,7 +31,7 @@
         android:layout_marginBottom="276dp"
         android:fontFamily="@font/aladin"
         android:gravity="center"
-        android:text="Lets make learning fun"
+        android:text="Lets make learning fun with antakshari"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

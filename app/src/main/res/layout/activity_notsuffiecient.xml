@@ -8,7 +8,7 @@
     tools:context=".Notsuffiecient">
 
     <com.github.nikartm.button.FitButton
-        android:id="@+id/fbtn2"
+        android:id="@+id/earn"
         android:layout_width="@dimen/_100sdp"
         android:layout_height="@dimen/_35sdp"
         android:layout_marginEnd="28dp"
@@ -36,7 +36,8 @@
         app:fb_textPaddingStart="@dimen/_10sdp"
         app:fb_textSize="@dimen/_20sdp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline7" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieAnimationView"
@@ -74,7 +75,7 @@
         app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView" />
 
     <com.github.nikartm.button.FitButton
-        android:id="@+id/loginbtn"
+        android:id="@+id/buybutton"
         android:layout_width="@dimen/_100sdp"
         android:layout_height="@dimen/_35sdp"
         android:layout_marginStart="32dp"
@@ -102,6 +103,14 @@
         app:fb_textPaddingStart="@dimen/_10sdp"
         app:fb_textSize="@dimen/_20sdp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline7" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.75" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

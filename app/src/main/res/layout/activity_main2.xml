@@ -7,19 +7,35 @@
     android:background="@drawable/backgroundchat"
     tools:context=".MainActivity2">
 
+    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+        android:id="@+id/circularProgressBar"
+        android:layout_width="50dp"
+        android:layout_height="54dp"
+        android:layout_below="@+id/progressBar"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        app:cpb_background_progressbar_color="#E8FF00"
+        app:cpb_background_progressbar_width="5dp"
+        app:cpb_progress_direction="to_right"
+        app:cpb_progressbar_color="#FF0000"
+        app:cpb_progressbar_width="5dp"
+        app:cpb_round_border="false">
+
+    </com.mikhaellopez.circularprogressbar.CircularProgressBar>
+
     <LinearLayout
         android:id="@+id/livestatus"
-        android:layout_width="143dp"
-        android:layout_height="45dp"
+        android:layout_width="188dp"
+        android:layout_height="52dp"
         android:layout_below="@+id/progressBar"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="9dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
         android:layout_toStartOf="@+id/scoreview2"
         android:layout_toEndOf="@+id/imageView6"
         android:background="#00FFFFFF"
-        android:orientation="horizontal">
-
+        android:orientation="horizontal" >
         <ImageView
             android:id="@+id/firstlive"
             android:layout_width="77dp"
@@ -129,8 +145,10 @@
                         android:background="#FFFFFF"
                         android:ems="10"
                         android:hint="Enter a message"
-                        android:inputType="textNoSuggestions|textPersonName"
+                        android:inputType="textNoSuggestions|textVisiblePassword"
                         android:textColor="#000000"
+                        android:textColorHint="#5A5959"
+                        android:textSize="@dimen/_12sdp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/guideline17"
                         app:layout_constraintHorizontal_bias="0.039"
@@ -199,23 +217,6 @@
             app:fb_textColor="#FFF" />
     </LinearLayout>
 
-    <com.mikhaellopez.circularprogressbar.CircularProgressBar
-        android:id="@+id/circularProgressBar"
-        android:layout_width="70dp"
-        android:layout_height="54dp"
-        android:layout_below="@+id/progressBar"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
-        app:cpb_background_progressbar_color="#E8FF00"
-        app:cpb_background_progressbar_width="5dp"
-        app:cpb_progress_direction="to_right"
-        app:cpb_progressbar_color="#FF0000"
-        app:cpb_progressbar_width="5dp"
-        app:cpb_round_border="false">
-
-    </com.mikhaellopez.circularprogressbar.CircularProgressBar>
-
     <TextView
         android:id="@+id/scoreview2"
         android:layout_width="70dp"
@@ -231,7 +232,7 @@
         android:textAlignment="center"
         android:textAllCaps="true"
         android:textColor="#FFE500"
-        android:textSize="18sp"
+        android:textSize="@dimen/_14sdp"
         android:textStyle="bold" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -244,8 +245,8 @@
         android:layout_width="42dp"
         android:layout_height="43dp"
         android:layout_above="@+id/listview"
-        android:layout_marginStart="0dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/circularProgressBar"
         app:srcCompat="@drawable/ic_gold" />
 
@@ -254,14 +255,14 @@
         android:layout_width="49dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/listview"
-        android:layout_marginStart="0dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/imageView5"
         android:background="#FAF097"
         android:gravity="center"
         android:text="0"
         android:textColor="#000000"
-        android:textSize="18sp"
+        android:textSize="@dimen/_14sdp"
         android:textStyle="bold" />
 
     <ImageView
@@ -270,7 +271,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/listview"
         android:layout_marginStart="1dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/coincount"
         app:srcCompat="@drawable/ic_baseline_add_24" />
 
